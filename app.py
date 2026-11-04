@@ -1,7 +1,9 @@
 from flask import Flask, render_template, request, redirect, session
+from jinja2 import DictLoader
 import sqlite3
 import os
 from openpyxl import load_workbook
+from template_sources import get_templates
 
 # =========================================================
 # PROJECT LOCATION
@@ -14,10 +16,8 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 # FLASK APPLICATION
 # =========================================================
 
-app = Flask(
-    __name__,
-    template_folder=os.path.join(BASE_DIR, "templates")
-)
+app = Flask(__name__)
+app.jinja_loader = DictLoader(get_templates())
 app.secret_key = os.environ.get("SECTION_SYNC_SECRET_KEY", "sectionsync-local-development-key")
 
 
@@ -25,10 +25,9 @@ app.secret_key = os.environ.get("SECTION_SYNC_SECRET_KEY", "sectionsync-local-de
 # DATABASE LOCATION
 # =========================================================
 
-DATABASE = os.path.join(
-    BASE_DIR,
-    "database",
-    "section_management.db"
+DATABASE = os.environ.get(
+    "SECTION_SYNC_DATABASE_PATH",
+    os.path.join(BASE_DIR, "database", "section_management.db")
 )
 
 
@@ -52,11 +51,8 @@ def get_db_connection():
 
 def create_database():
 
-    # Create database folder
-    os.makedirs(
-        os.path.join(BASE_DIR, "database"),
-        exist_ok=True
-    )
+    # Ensure the configured database path has a parent directory.
+    os.makedirs(os.path.dirname(os.path.abspath(DATABASE)), exist_ok=True)
 
     connection = get_db_connection()
     cursor = connection.cursor()
@@ -211,8 +207,12 @@ def create_database():
         ).fetchone()
         if existing:
             cursor.execute(
-                "UPDATE students SET password = ? WHERE enrollment_no = ?",
-                ("college@123", enrollment_no)
+                "UPDATE students SET password = ?, cgpa = ? WHERE enrollment_no = ?",
+                (
+                    "college@123",
+                    round(4.2 + ((index * 37) % 580) / 100, 2),
+                    enrollment_no,
+                )
             )
             if number == 618:
                 cursor.execute("""
@@ -220,7 +220,7 @@ def create_database():
                         email = ?, batch = ?, cgpa = ? WHERE enrollment_no = ?
                 """, (
                     "Preethi Rao", "CSE", "15-08-2007",
-                    "preethi@college.edu", "2024-2028", 3.65, enrollment_no
+                    "preethi@college.edu", "2024-2028", 6.35, enrollment_no
                 ))
             continue
 
@@ -234,7 +234,7 @@ def create_database():
             enrollment_no, "college@123", demo_programs[index % len(demo_programs)],
             f"{(index % 28) + 1:02d}-0{(index % 9) + 1}-2006",
             f"{enrollment_no.lower()}@college.edu", "2024-2028",
-            round(2.2 + ((index * 17) % 181) / 100, 2),
+            round(4.2 + ((index * 37) % 580) / 100, 2),
         ))
 
     cursor.execute("""
@@ -278,6 +278,13 @@ def create_database():
             order_id TEXT UNIQUE NOT NULL,
 
             payment_status TEXT NOT NULL
+        )
+    """)
+
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS approved_fee_orders (
+            order_id TEXT PRIMARY KEY,
+            uploaded_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
         )
     """)
 
@@ -592,11 +599,79 @@ def admin_login():
 # ADMIN DASHBOARD
 # =========================================================
 
-@app.route("/admin/dashboard")
+@app.route("/admin/dashboard", methods=["GET", "POST"])
 def admin_dashboard():
 
+    message = None
+    error = None
+
+    if request.method == "POST":
+        excel_file = request.files.get("excel_file")
+        if not excel_file or not excel_file.filename:
+            error = "Choose an .xlsx file to upload."
+        elif not excel_file.filename.lower().endswith(".xlsx"):
+            error = "Please upload an .xlsx Excel file."
+        else:
+            workbook = None
+            connection = None
+            try:
+                workbook = load_workbook(
+                    excel_file, read_only=True, data_only=True
+                )
+                sheet = workbook.active
+                rows = sheet.iter_rows(values_only=True)
+                first_row = next(rows, None)
+                headers = [
+                    "_".join(str(value).strip().lower().split())
+                    if value is not None else ""
+                    for value in (first_row or ())
+                ]
+                if "order_id" not in headers:
+                    error = "The first row must contain an order_id column header."
+                else:
+                    order_id_index = headers.index("order_id")
+                    connection = get_db_connection()
+                    inserted = 0
+                    skipped = 0
+                    seen = set()
+                    for values in rows:
+                        value = values[order_id_index] if order_id_index < len(values) else None
+                        if value is None:
+                            skipped += 1
+                            continue
+                        if isinstance(value, float) and value.is_integer():
+                            order_id = str(int(value))
+                        else:
+                            order_id = str(value).strip()
+                        if not order_id or order_id in seen:
+                            skipped += 1
+                            continue
+                        seen.add(order_id)
+                        cursor = connection.execute(
+                            "INSERT OR IGNORE INTO approved_fee_orders (order_id) VALUES (?)",
+                            (order_id,)
+                        )
+                        inserted += cursor.rowcount
+                        skipped += cursor.rowcount == 0
+                    connection.commit()
+                    message = (
+                        f"Upload complete: {inserted} new order ID(s) added; "
+                        f"{skipped} blank, duplicate, or already uploaded row(s) skipped."
+                    )
+            except Exception:
+                if connection:
+                    connection.rollback()
+                error = "Unable to read this workbook. Upload a valid .xlsx file with an order_id column."
+            finally:
+                if connection:
+                    connection.close()
+                if workbook:
+                    workbook.close()
+
     return render_template(
-        "admin/dashboard.html"
+        "admin/dashboard.html",
+        message=message,
+        error=error
     )
 
 @app.route("/admin/profile")
@@ -940,6 +1015,79 @@ def student_management():
 # SECTION CAPACITY
 # =========================================================
 
+def merge_prefixed_section_duplicates(connection):
+    """Merge legacy entries like `section J` into the canonical section `J`."""
+    duplicate_sections = connection.execute("""
+        SELECT id, section_name, program, capacity
+        FROM sections
+        WHERE LOWER(section_name) LIKE 'section %'
+        ORDER BY id
+    """).fetchall()
+    preferences_exist = connection.execute("""
+        SELECT 1 FROM sqlite_master
+        WHERE type = 'table' AND name = 'student_preferences'
+    """).fetchone() is not None
+
+    for duplicate in duplicate_sections:
+        canonical_name = duplicate["section_name"][8:].strip().upper()
+        if not canonical_name:
+            continue
+
+        canonical = connection.execute("""
+            SELECT id, capacity FROM sections
+            WHERE program = ? AND UPPER(section_name) = ? AND id != ?
+            ORDER BY id LIMIT 1
+        """, (duplicate["program"], canonical_name, duplicate["id"])).fetchone()
+
+        if canonical is None:
+            connection.execute(
+                "UPDATE sections SET section_name = ? WHERE id = ?",
+                (canonical_name, duplicate["id"])
+            )
+            continue
+
+        allocation_count = connection.execute("""
+            SELECT COUNT(*) FROM allocations
+            WHERE section_id IN (?, ?)
+        """, (canonical["id"], duplicate["id"])).fetchone()[0]
+        if allocation_count > canonical["capacity"]:
+            connection.execute(
+                "UPDATE sections SET capacity = ? WHERE id = ?",
+                (allocation_count, canonical["id"])
+            )
+
+        connection.execute(
+            "UPDATE allocations SET section_id = ? WHERE section_id = ?",
+            (canonical["id"], duplicate["id"])
+        )
+
+        if preferences_exist:
+            old_preferences = connection.execute("""
+                SELECT p.id, p.student_id
+                FROM student_preferences p
+                JOIN students s ON s.id = p.student_id
+                WHERE p.section_name = ? AND s.program = ?
+            """, (duplicate["section_name"], duplicate["program"])).fetchall()
+            for preference in old_preferences:
+                already_saved = connection.execute("""
+                    SELECT 1 FROM student_preferences
+                    WHERE student_id = ? AND section_name = ?
+                """, (preference["student_id"], canonical_name)).fetchone()
+                if already_saved:
+                    connection.execute(
+                        "DELETE FROM student_preferences WHERE id = ?",
+                        (preference["id"],)
+                    )
+                else:
+                    connection.execute(
+                        "UPDATE student_preferences SET section_name = ? WHERE id = ?",
+                        (canonical_name, preference["id"])
+                    )
+
+        connection.execute("DELETE FROM sections WHERE id = ?", (duplicate["id"],))
+
+    connection.commit()
+
 @app.route("/admin/section-capacity", methods=["GET", "POST"])
 def section_capacity():
 
@@ -968,35 +1116,68 @@ def section_capacity():
         )
     """)
 
+    merge_prefixed_section_duplicates(connection)
+
     if request.method == "POST":
         action = request.form.get("action", "add")
-        section_name = request.form.get("section_name", "").strip()
-        program = request.form.get("program", "").strip()
-
-        try:
-            capacity = int(request.form.get("capacity", ""))
-        except ValueError:
-            capacity = 0
-
-        if action != "add":
-            error = "That section action is not supported."
-        elif not section_name or not program:
-            error = "Section name and program are required."
-        elif capacity < 1:
-            error = "Seat capacity must be at least 1."
-        else:
+        if action == "add":
+            section_name = request.form.get("section_name", "").strip()
+            program = request.form.get("program", "").strip()
             try:
-                connection.execute("""
-                    INSERT INTO sections (section_name, program, capacity)
-                    VALUES (?, ?, ?)
-                """, (section_name, program, capacity))
-                connection.commit()
-                message = "Section added successfully."
-            except sqlite3.IntegrityError:
-                error = "That section already exists for this program."
+                capacity = int(request.form.get("capacity", ""))
+            except ValueError:
+                capacity = 0
+
+            if not section_name or not program:
+                error = "Section name and program are required."
+            elif capacity < 1:
+                error = "Seat capacity must be at least 1."
+            else:
+                try:
+                    connection.execute("""
+                        INSERT INTO sections (section_name, program, capacity)
+                        VALUES (?, ?, ?)
+                    """, (section_name, program, capacity))
+                    connection.commit()
+                    message = "Section added successfully."
+                except sqlite3.IntegrityError:
+                    error = "That section already exists for this program."
+        elif action == "edit":
+            try:
+                section_id = int(request.form.get("section_id", ""))
+                capacity = int(request.form.get("capacity", ""))
+            except ValueError:
+                section_id = 0
+                capacity = 0
+
+            if section_id < 1:
+                error = "Select a valid section to edit."
+            elif capacity < 1:
+                error = "Seat capacity must be at least 1."
+            else:
+                section = connection.execute("""
+                    SELECT sec.id, COUNT(a.id) AS allocated
+                    FROM sections sec
+                    LEFT JOIN allocations a ON a.section_id = sec.id
+                    WHERE sec.id = ?
+                    GROUP BY sec.id
+                """, (section_id,)).fetchone()
+                if section is None:
+                    error = "The selected section could not be found."
+                elif capacity < section["allocated"]:
+                    error = f"Capacity cannot be less than its {section['allocated']} allocated student(s)."
+                else:
+                    connection.execute(
+                        "UPDATE sections SET capacity = ? WHERE id = ?",
+                        (capacity, section_id)
+                    )
+                    connection.commit()
+                    message = "Section capacity updated successfully."
+        else:
+            error = "That section action is not supported."
 
     sections = connection.execute("""
-        SELECT sec.section_name, sec.program, sec.capacity,
+        SELECT sec.id, sec.section_name, sec.program, sec.capacity,
                COUNT(a.id) AS allocated,
                sec.capacity - COUNT(a.id) AS available
         FROM sections sec
@@ -1238,6 +1419,7 @@ def allocation_management():
 
             allocated_count = 0
             missing_cgpa = 0
+            below_minimum = 0
             missing_preferences = 0
             unfilled_capacity = 0
 
@@ -1287,6 +1469,7 @@ def allocation_management():
                     if cgpa is None:
                         missing_cgpa += 1
                     elif cgpa < minimum:
+                        below_minimum += 1
                         continue
                     elif cgpa < medium:
                         bands["low"].append(student)
@@ -1336,6 +1519,7 @@ def allocation_management():
             if not error:
                 message = (
                     f"Allocation completed: {allocated_count} student(s) assigned. "
+                    f"{below_minimum} below their program minimum CGPA, "
                     f"{missing_cgpa} missing CGPA, {missing_preferences} missing preferences, "
                     f"and {unfilled_capacity} could not fit a preferred section."
                 )
@@ -1366,6 +1550,354 @@ def allocation_management():
         allocation_rows=allocation_rows,
         message=message,
         error=error
+    )
+
+
+# =========================================================
+# ALLOCATION STATISTICS
+# =========================================================
+
+@app.route("/admin/subjects-faculty", methods=["GET", "POST"])
+def subjects_faculty():
+
+    programs = ["CSE", "AI&DS", "AI&ML", "AI", "EEE", "ECE"]
+    sections_by_program = {
+        "CSE": ["A", "B", "C", "D"],
+        "AI&DS": ["E", "F", "G"],
+        "AI&ML": ["H", "I"],
+        "AI": ["J", "K"],
+        "EEE": ["L", "M"],
+        "ECE": ["N", "O"],
+    }
+    message = None
+    error = None
+    connection = get_db_connection()
+    connection.execute("""
+        CREATE TABLE IF NOT EXISTS sections (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            section_name TEXT NOT NULL,
+            program TEXT NOT NULL,
+            capacity INTEGER NOT NULL CHECK (capacity > 0),
+            UNIQUE (section_name, program)
+        )
+    """)
+    connection.execute("""
+        CREATE TABLE IF NOT EXISTS allocations (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            student_id INTEGER NOT NULL UNIQUE,
+            section_id INTEGER NOT NULL,
+            cgpa_band TEXT NOT NULL,
+            allocated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+        )
+    """)
+    connection.execute("""
+        CREATE TABLE IF NOT EXISTS subjects (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            program TEXT NOT NULL,
+            semester TEXT NOT NULL DEFAULT 'III',
+            batch TEXT NOT NULL DEFAULT '2024-2028',
+            subject_name TEXT NOT NULL,
+            lecture INTEGER NOT NULL DEFAULT 0,
+            tutorial INTEGER NOT NULL DEFAULT 0,
+            practical INTEGER NOT NULL DEFAULT 0,
+            credits INTEGER NOT NULL DEFAULT 0
+        )
+    """)
+    connection.execute("""
+        CREATE TABLE IF NOT EXISTS subject_faculty (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            subject_id INTEGER NOT NULL,
+            section_name TEXT NOT NULL,
+            faculty_name TEXT NOT NULL,
+            UNIQUE (subject_id, section_name),
+            FOREIGN KEY (subject_id) REFERENCES subjects(id) ON DELETE CASCADE
+        )
+    """)
+    merge_prefixed_section_duplicates(connection)
+
+    # Seed any missing mapped sections so every program basket has its columns.
+    for program, section_names in sections_by_program.items():
+        for section_name in section_names:
+            connection.execute("""
+                INSERT OR IGNORE INTO sections (section_name, program, capacity)
+                VALUES (?, ?, 50)
+            """, (section_name, program))
+
+    # Start with the two sample baskets shown in the supplied reference.
+    # They are inserted only once, so later edits remain the administrator's.
+    if connection.execute("SELECT COUNT(*) FROM subjects").fetchone()[0] == 0:
+        sample_baskets = {
+            "CSE": [
+                ("Principle of Cryptography", 3, 0, 0, 3, ["Dr. Satya Vivek", "Dr. Adinarayana Reddy", "Dr. Satya Vivek", "Dr. Adinarayana Reddy"]),
+                ("Computer Networks", 3, 0, 2, 4, ["Dr. K. Sridevi", "Dr. Muni Sekhar V", "Dr. K. Sridevi", "Ms. Neha"]),
+                ("Programming Language and Compiler Construction", 3, 0, 3, 3, ["Dr. Pradosh", "Dr. Deevenaraju B", "Dr. Pradosh", "Dr. Deevenaraju B"]),
+                ("Machine Learning", 3, 0, 2, 4, ["Dr. Arunarsi T", "Dr. Sabhapathi", "Dr. Arunarsi T", "Dr. Santosh Babu"]),
+                ("Software Engineering", 3, 0, 3, 3, ["Dr. Sandeep", "Mrs. Smeetha B", "Dr. Sandeep", "Mrs. Smeetha B"]),
+                ("Special Project", 3, 0, 0, 3, []),
+                ("Constitution of India (MOOCS)", 2, 0, 2, 2, []),
+                ("Power Skills-III", 0, 0, 2, 1, []),
+            ],
+            "AI&DS": [
+                ("Mathematistic Optimization Techniques", 2, 1, 0, 3, ["Dr. Upendar Mendu", "Dr. Upendar Mendu", "Dr. Upendar Mendu"]),
+                ("Computer Networks", 3, 0, 2, 4, ["Dr. Muni Sekhar V", "Mr. Jagdish", "Dr. K. Sridevi"]),
+                ("Blockchain Technology", 3, 0, 3, 3, ["Dr. Jangam Ebenezer", "Ms. Madhusmita", "Dr. Jangam Ebenezer"]),
+                ("Data Wrangling and Visualization", 3, 0, 2, 3, ["Dr. P. Pavan Kumar", "Dr. P. Pavan Kumar", "Mr. Venugopal"]),
+                ("Computer Vision", 3, 0, 3, 3, ["Dr. Chakradhar P", "Dr. N. Suresh", "Dr. Chakradhar P"]),
+                ("Special Project", 3, 0, 0, 3, []),
+                ("Constitution of India (MOOCS)", 2, 0, 2, 2, []),
+                ("Power Skills-III", 0, 0, 2, 1, []),
+            ],
+        }
+        section_orders = {"CSE": ["A", "B", "C", "D"], "AI&DS": ["E", "F", "G"]}
+        for program, subjects in sample_baskets.items():
+            for subject_name, lecture, tutorial, practical, credits, faculty_names in subjects:
+                cursor = connection.execute("""
+                    INSERT INTO subjects
+                        (program, semester, batch, subject_name,
+                         lecture, tutorial, practical, credits)
+                    VALUES (?, 'III', '2024-2028', ?, ?, ?, ?, ?)
+                """, (program, subject_name, lecture, tutorial, practical, credits))
+                subject_id = cursor.lastrowid
+                for section_name, faculty_name in zip(section_orders[program], faculty_names):
+                    connection.execute("""
+                        INSERT INTO subject_faculty (subject_id, section_name, faculty_name)
+                        VALUES (?, ?, ?)
+                    """, (subject_id, section_name, faculty_name))
+
+        for section_name in section_orders["CSE"]:
+            connection.execute(
+                "UPDATE sections SET capacity = 75 WHERE program = 'CSE' AND section_name = ? AND capacity = 50",
+                (section_name,)
+            )
+        for section_name, capacity in (("E", 60), ("F", 60), ("G", 55)):
+            connection.execute(
+                "UPDATE sections SET capacity = ? WHERE program = 'AI&DS' AND section_name = ? AND capacity = 50",
+                (capacity, section_name)
+            )
+        connection.commit()
+
+    if request.method == "POST":
+        action = request.form.get("action", "")
+        if action == "add_subject":
+            program = request.form.get("program", "").strip()
+            semester = request.form.get("semester", "III").strip()
+            batch = request.form.get("batch", "").strip()
+            subject_name = request.form.get("subject_name", "").strip()
+            numeric_fields = ("lecture", "tutorial", "practical", "credits")
+            try:
+                values = [int(request.form.get(field, "0")) for field in numeric_fields]
+            except ValueError:
+                values = [-1]
+
+            if program not in programs:
+                error = "Select a valid program."
+            elif not subject_name or not semester or not batch:
+                error = "Subject, semester, and batch are required."
+            elif len(values) != 4 or any(value < 0 for value in values):
+                error = "L, T, P, and C values must be zero or greater."
+            else:
+                connection.execute("""
+                    INSERT INTO subjects
+                        (program, semester, batch, subject_name,
+                         lecture, tutorial, practical, credits)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                """, (program, semester, batch, subject_name, *values))
+                connection.commit()
+                message = f"{subject_name} added to the {program} basket."
+
+        elif action == "save_faculty":
+            program = request.form.get("program", "").strip()
+            semester = request.form.get("semester", "").strip()
+            batch = request.form.get("batch", "").strip()
+            if program not in programs:
+                error = "Select a valid program basket."
+            else:
+                basket_subjects = connection.execute("""
+                    SELECT id FROM subjects
+                    WHERE program = ? AND semester = ? AND batch = ?
+                """, (program, semester, batch)).fetchall()
+                for subject in basket_subjects:
+                    connection.execute(
+                        "DELETE FROM subject_faculty WHERE subject_id = ?",
+                        (subject["id"],)
+                    )
+                    for section_name in sections_by_program[program]:
+                        faculty_name = request.form.get(
+                            f"faculty_{subject['id']}_{section_name}", ""
+                        ).strip()
+                        if faculty_name:
+                            connection.execute("""
+                                INSERT INTO subject_faculty
+                                    (subject_id, section_name, faculty_name)
+                                VALUES (?, ?, ?)
+                            """, (subject["id"], section_name, faculty_name))
+                connection.commit()
+                message = f"Faculty assignments saved for {program}."
+        else:
+            error = "That subjects and faculty action is not supported."
+
+    subject_rows = connection.execute("""
+        SELECT id, program, semester, batch, subject_name,
+               lecture, tutorial, practical, credits
+        FROM subjects
+        ORDER BY program, semester, batch, id
+    """).fetchall()
+    faculty_rows = connection.execute("""
+        SELECT sf.subject_id, sf.section_name, sf.faculty_name
+        FROM subject_faculty sf
+        JOIN subjects sub ON sub.id = sf.subject_id
+    """).fetchall()
+    faculty_by_subject = {}
+    for faculty in faculty_rows:
+        faculty_by_subject.setdefault(faculty["subject_id"], {})[
+            faculty["section_name"]
+        ] = faculty["faculty_name"]
+
+    basket_map = {}
+    for subject in subject_rows:
+        key = (subject["program"], subject["semester"], subject["batch"])
+        if key not in basket_map:
+            student_count = connection.execute("""
+                SELECT COUNT(*) FROM students WHERE program = ? AND batch = ?
+            """, (subject["program"], subject["batch"])).fetchone()[0]
+            capacities = connection.execute("""
+                SELECT section_name, capacity FROM sections WHERE program = ?
+            """, (subject["program"],)).fetchall()
+            capacity_by_section = {row["section_name"]: row["capacity"] for row in capacities}
+            basket_map[key] = {
+                "program": subject["program"],
+                "semester": subject["semester"],
+                "batch": subject["batch"],
+                "student_count": student_count,
+                "sections": [
+                    {
+                        "name": section_name,
+                        "capacity": capacity_by_section.get(section_name, 0),
+                    }
+                    for section_name in sections_by_program[subject["program"]]
+                ],
+                "subjects": [],
+            }
+        subject_data = dict(subject)
+        subject_data["faculty"] = faculty_by_subject.get(subject["id"], {})
+        basket_map[key]["subjects"].append(subject_data)
+
+    connection.commit()
+    connection.close()
+    return render_template(
+        "admin/subjects_faculty.html",
+        programs=programs,
+        sections_by_program=sections_by_program,
+        baskets=list(basket_map.values()),
+        message=message,
+        error=error,
+    )
+
+@app.route("/admin/statistics")
+def allocation_statistics():
+
+    connection = get_db_connection()
+    connection.execute("""
+        CREATE TABLE IF NOT EXISTS sections (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            section_name TEXT NOT NULL,
+            program TEXT NOT NULL,
+            capacity INTEGER NOT NULL CHECK (capacity > 0),
+            UNIQUE (section_name, program)
+        )
+    """)
+    connection.execute("""
+        CREATE TABLE IF NOT EXISTS allocations (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            student_id INTEGER NOT NULL UNIQUE,
+            section_id INTEGER NOT NULL,
+            cgpa_band TEXT NOT NULL,
+            allocated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+        )
+    """)
+    merge_prefixed_section_duplicates(connection)
+
+    total_students = connection.execute(
+        "SELECT COUNT(*) FROM students"
+    ).fetchone()[0]
+    allocated_students = connection.execute(
+        "SELECT COUNT(DISTINCT student_id) FROM allocations"
+    ).fetchone()[0]
+    allocated_students = min(allocated_students, total_students)
+    unallocated_students = total_students - allocated_students
+    allocation_rate = round(allocated_students * 100 / total_students) if total_students else 0
+
+    program_rows = connection.execute("""
+        SELECT s.program,
+               COUNT(DISTINCT s.id) AS total,
+               COUNT(DISTINCT a.student_id) AS allocated
+        FROM students s
+        LEFT JOIN allocations a ON a.student_id = s.id
+        GROUP BY s.program
+        ORDER BY s.program
+    """).fetchall()
+    program_stats = []
+    for row in program_rows:
+        total = row["total"]
+        allocated = row["allocated"]
+        program_stats.append({
+            "program": row["program"],
+            "total": total,
+            "allocated": allocated,
+            "unallocated": total - allocated,
+            "allocated_percent": round(allocated * 100 / total) if total else 0,
+        })
+
+    section_rows = connection.execute("""
+        SELECT sec.section_name, sec.program, sec.capacity,
+               COUNT(DISTINCT a.student_id) AS allocated
+        FROM sections sec
+        LEFT JOIN allocations a ON a.section_id = sec.id
+        GROUP BY sec.id
+        ORDER BY sec.program, sec.section_name
+    """).fetchall()
+    section_stats = []
+    for row in section_rows:
+        section_stats.append({
+            "section_name": row["section_name"],
+            "program": row["program"],
+            "capacity": row["capacity"],
+            "allocated": row["allocated"],
+            "occupancy_percent": min(
+                round(row["allocated"] * 100 / row["capacity"]), 100
+            ) if row["capacity"] else 0,
+        })
+
+    band_rows = connection.execute("""
+        SELECT LOWER(cgpa_band) AS band, COUNT(*) AS total
+        FROM allocations
+        GROUP BY LOWER(cgpa_band)
+    """).fetchall()
+    band_counts = {"low": 0, "medium": 0, "high": 0}
+    for row in band_rows:
+        if row["band"] in band_counts:
+            band_counts[row["band"]] = row["total"]
+    maximum_band_count = max(band_counts.values(), default=0)
+    band_stats = [
+        {
+            "band": band.title(),
+            "count": count,
+            "percent": round(count * 100 / maximum_band_count) if maximum_band_count else 0,
+        }
+        for band, count in band_counts.items()
+    ]
+    connection.close()
+
+    return render_template(
+        "admin/reports.html",
+        total_students=total_students,
+        allocated_students=allocated_students,
+        unallocated_students=unallocated_students,
+        allocation_rate=allocation_rate,
+        program_stats=program_stats,
+        section_stats=section_stats,
+        band_stats=band_stats,
+        band_counts=band_counts,
     )
 
 # =========================================================
@@ -1672,6 +2204,33 @@ def fee_verification():
             order_id,
             student["enrollment_no"],
         )).fetchone()
+
+        # Uploaded order IDs are approved by the admin. Claim a matching ID
+        # for the signed-in student the first time it is submitted.
+        if payment is None:
+            approved_order = connection.execute(
+                "SELECT order_id FROM approved_fee_orders WHERE order_id = ?",
+                (order_id,)
+            ).fetchone()
+            if approved_order:
+                try:
+                    connection.execute("""
+                        INSERT INTO fee_payments (
+                            student_name, enrollment_no, order_id, payment_status
+                        ) VALUES (?, ?, ?, 'Verified')
+                    """, (
+                        student["student_name"],
+                        student["enrollment_no"],
+                        order_id
+                    ))
+                    connection.commit()
+                    payment = connection.execute("""
+                        SELECT student_name, enrollment_no, order_id, payment_status
+                        FROM fee_payments
+                        WHERE order_id = ? AND enrollment_no = ?
+                    """, (order_id, student["enrollment_no"])).fetchone()
+                except sqlite3.IntegrityError:
+                    connection.rollback()
 
 
         # Close database

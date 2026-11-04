@@ -1,0 +1,18 @@
+services:
+  - type: web
+    name: sectionsync
+    runtime: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: python -c "from app import create_database; create_database()" && gunicorn app:app
+    healthCheckPath: /
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.12.8
+      - key: SECTION_SYNC_SECRET_KEY
+        generateValue: true
+      - key: SECTION_SYNC_DATABASE_PATH
+        value: /var/data/section_management.db
+    disk:
+      name: sectionsync-data
+      mountPath: /var/data
+      sizeGB: 1
