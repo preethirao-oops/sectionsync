@@ -1,3 +1,330 @@
 """Python source for the admin/dashboard.html page template."""
 
-TEMPLATE_SOURCE = '<!DOCTYPE html>\n<html lang="en">\n<head>\n    <meta charset="UTF-8">\n    <meta name="viewport" content="width=device-width, initial-scale=1.0">\n\n    <title>Admin Dashboard - SectionSync</title>\n\n    <style>\n        * {\n            margin: 0;\n            padding: 0;\n            box-sizing: border-box;\n            font-family: Arial, sans-serif;\n        }\n\n        body {\n            background: #f7f7fb;\n            color: #27263a;\n        }\n\n        /* SIDEBAR */\n        .sidebar {\n            position: fixed;\n            left: 0;\n            top: 0;\n            width: 250px;\n            height: 100vh;\n            background: #25233d;\n            color: white;\n            padding: 25px 15px;\n            overflow-y: auto;\n        }\n\n        .logo {\n            font-size: 25px;\n            font-weight: bold;\n            text-align: center;\n            margin-bottom: 8px;\n        }\n\n        .panel-name {\n            text-align: center;\n            color: #bdb9d2;\n            font-size: 13px;\n            margin-bottom: 30px;\n        }\n\n        .menu-title {\n            color: #9692ad;\n            font-size: 11px;\n            font-weight: bold;\n            text-transform: uppercase;\n            margin: 18px 10px 8px;\n        }\n\n        .sidebar a {\n            display: block;\n            text-decoration: none;\n            color: #d8d5e4;\n            padding: 11px 14px;\n            margin: 3px 0;\n            border-radius: 8px;\n            font-size: 14px;\n            transition: 0.2s;\n        }\n\n        .sidebar a:hover {\n            background: #353250;\n            color: white;\n        }\n\n        .sidebar a.active {\n            background: #d8c5ff;\n            color: #25233d;\n            font-weight: bold;\n        }\n\n        .submenu a {\n            padding-left: 32px;\n            font-size: 13px;\n        }\n\n        .logout {\n            margin-top: 25px !important;\n            color: #ffb6b6 !important;\n        }\n\n        /* MAIN CONTENT */\n        .main {\n            margin-left: 250px;\n            padding: 35px 40px;\n            min-height: 100vh;\n        }\n\n        .top-section {\n            display: flex;\n            justify-content: space-between;\n            align-items: center;\n            margin-bottom: 30px;\n        }\n\n        .page-title h1 {\n            font-size: 28px;\n            margin-bottom: 7px;\n        }\n\n        .page-title p {\n            color: #77758a;\n            font-size: 14px;\n        }\n\n        .admin-badge {\n            background: white;\n            border: 1px solid #e6e3ef;\n            padding: 10px 17px;\n            border-radius: 10px;\n            color: #6240b8;\n            font-size: 13px;\n            font-weight: bold;\n        }\n\n        /* WELCOME CARD */\n        .welcome-card {\n            background: linear-gradient(135deg, #7845e8, #713ce6);\n            color: white;\n            border-radius: 16px;\n            padding: 32px 35px;\n            margin-top: 20px;\n            box-shadow: 0 8px 25px rgba(113, 60, 230, 0.15);\n        }\n\n        .welcome-card h2 {\n            font-size: 23px;\n            margin-bottom: 10px;\n        }\n\n        .welcome-card p {\n            font-size: 14px;\n            line-height: 1.6;\n            opacity: 0.92;\n        }\n\n        .fee-upload-card {\n            background: white;\n            border: 1px solid #e6e3ef;\n            border-radius: 14px;\n            padding: 26px 30px;\n            margin-top: 24px;\n            box-shadow: 0 5px 18px rgba(37, 35, 61, 0.05);\n        }\n\n        .fee-upload-card h2 { font-size: 19px; margin-bottom: 8px; }\n        .fee-upload-card p { color: #77758a; font-size: 14px; line-height: 1.5; margin-bottom: 16px; }\n        .fee-upload-card input[type="file"] { display: block; margin-bottom: 14px; }\n        .fee-upload-card button {\n            border: 0; border-radius: 8px; padding: 11px 17px;\n            background: #713ce6; color: white; font-weight: bold; cursor: pointer;\n        }\n        .fee-upload-card button:hover { background: #5e2dc7; }\n        .upload-message, .upload-error { padding: 12px 15px; border-radius: 8px; margin: 15px 0; font-size: 14px; }\n        .upload-message { background: #eaf8ef; color: #216e39; }\n        .upload-error { background: #fff0f0; color: #a52b2b; }\n\n        /* RESPONSIVE */\n        @media (max-width: 700px) {\n\n            .sidebar {\n                width: 210px;\n            }\n\n            .main {\n                margin-left: 210px;\n                padding: 25px 20px;\n            }\n\n            .top-section {\n                align-items: flex-start;\n                gap: 15px;\n            }\n\n            .admin-badge {\n                display: none;\n            }\n        }\n    </style>\n</head>\n\n<body>\n\n    <!-- SIDEBAR -->\n    <div class="sidebar">\n\n        <div class="logo">\n            SectionSync\n        </div>\n\n        <div class="panel-name">\n            Administrator Panel\n        </div>\n\n\n        <!-- DASHBOARD -->\n        <a href="/admin/dashboard" class="active">\n            Dashboard\n        </a>\n\n\n        <!-- ADMIN PROFILE -->\n        <a href="/admin/profile">\n            Admin Profile\n        </a>\n\n<!-- STUDENT MANAGEMENT -->\n<div class="menu-title">\n    Student Management\n</div>\n\n<div class="submenu">\n    <a href="{{ url_for(\'student_management\') }}">\n        Student Management\n    </a>\n\n</div>\n\n\n        <!-- SECTION MANAGEMENT -->\n        <div class="menu-title">\n            Section Management\n        </div>\n\n        <div class="submenu">\n\n            <a href="/admin/section-capacity">\n                Section Capacity\n            </a>\n\n            <a href="/admin/cgpa-constraints">\n                CGPA Constraints\n            </a>\n\n        </div>\n\n\n        <!-- OTHER ADMIN MODULES -->\n        <a href="/admin/preferences">\n            Student Preferences\n        </a>\n\n        <a href="/admin/allocation">\n            Final Allocation\n        </a>\n\n        <a href="/admin/subjects-faculty">\n            Subjects & Faculty\n        </a>\n\n        <a href="/admin/statistics">\n            Allocation Statistics\n        </a>\n\n\n        <!-- LOGOUT -->\n        <a href="/admin/login" class="logout">\n            Logout\n        </a>\n\n    </div>\n\n\n    <!-- MAIN CONTENT -->\n    <div class="main">\n\n        <!-- HEADER -->\n        <div class="top-section">\n\n            <div class="page-title">\n\n                <h1>\n                    Admin Dashboard\n                </h1>\n\n                <p>\n                    Manage students, sections, preferences and allocation\n                    through SectionSync.\n                </p>\n\n            </div>\n\n\n            <div class="admin-badge">\n                Administrator\n            </div>\n\n        </div>\n\n\n        {% if message %}<div class="upload-message">{{ message }}</div>{% endif %}\n        {% if error %}<div class="upload-error">{{ error }}</div>{% endif %}\n\n        <!-- WELCOME CARD -->\n        <div class="welcome-card">\n\n            <h2>\n                Welcome to SectionSync Admin Panel\n            </h2>\n\n            <p>\n                Manage student information, sections, preferences and\n                allocation from the administrator panel.\n            </p>\n\n        </div>\n\n        <section class="fee-upload-card">\n            <h2>Upload Fee Order IDs</h2>\n            <p>Upload an .xlsx workbook with an <strong>order_id</strong> column in the first row and one approved order ID per row. Students can use these IDs on the Fee Verification page.</p>\n            <form method="POST" action="/admin/dashboard" enctype="multipart/form-data">\n                <input type="file" name="excel_file" accept=".xlsx" required>\n                <button type="submit">Upload Order IDs</button>\n            </form>\n        </section>\n\n    </div>\n\n</body>\n</html>\n'
+TEMPLATE_SOURCE = r"""<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Admin Dashboard - SectionSync</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background: #f7f7fb;
+            color: #27263a;
+        }
+
+        /* SIDEBAR */
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 250px;
+            height: 100vh;
+            background: #25233d;
+            color: white;
+            padding: 25px 15px;
+            overflow-y: auto;
+        }
+
+        .logo {
+            font-size: 25px;
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 8px;
+        }
+
+        .panel-name {
+            text-align: center;
+            color: #bdb9d2;
+            font-size: 13px;
+            margin-bottom: 30px;
+        }
+
+        .menu-title {
+            color: #9692ad;
+            font-size: 11px;
+            font-weight: bold;
+            text-transform: uppercase;
+            margin: 18px 10px 8px;
+        }
+
+        .sidebar a {
+            display: block;
+            text-decoration: none;
+            color: #d8d5e4;
+            padding: 11px 14px;
+            margin: 3px 0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: 0.2s;
+        }
+
+        .sidebar a:hover {
+            background: #353250;
+            color: white;
+        }
+
+        .sidebar a.active {
+            background: #d8c5ff;
+            color: #25233d;
+            font-weight: bold;
+        }
+
+        .submenu a {
+            padding-left: 32px;
+            font-size: 13px;
+        }
+
+        .logout {
+            margin-top: 25px !important;
+            color: #ffb6b6 !important;
+        }
+
+        /* MAIN CONTENT */
+        .main {
+            margin-left: 250px;
+            padding: 35px 40px;
+            min-height: 100vh;
+        }
+
+        .top-section {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .page-title h1 {
+            font-size: 28px;
+            margin-bottom: 7px;
+        }
+
+        .page-title p {
+            color: #77758a;
+            font-size: 14px;
+        }
+
+        .admin-badge {
+            background: white;
+            border: 1px solid #e6e3ef;
+            padding: 10px 17px;
+            border-radius: 10px;
+            color: #6240b8;
+            font-size: 13px;
+            font-weight: bold;
+        }
+
+        /* WELCOME CARD */
+        .welcome-card {
+            background: linear-gradient(135deg, #7845e8, #713ce6);
+            color: white;
+            border-radius: 16px;
+            padding: 32px 35px;
+            margin-top: 20px;
+            box-shadow: 0 8px 25px rgba(113, 60, 230, 0.15);
+        }
+
+        .welcome-card h2 {
+            font-size: 23px;
+            margin-bottom: 10px;
+        }
+
+        .welcome-card p {
+            font-size: 14px;
+            line-height: 1.6;
+            opacity: 0.92;
+        }
+
+        .fee-upload-card {
+            background: white;
+            border: 1px solid #e6e3ef;
+            border-radius: 14px;
+            padding: 26px 30px;
+            margin-top: 24px;
+            box-shadow: 0 5px 18px rgba(37, 35, 61, 0.05);
+        }
+
+        .fee-upload-card h2 { font-size: 19px; margin-bottom: 8px; }
+        .fee-upload-card p { color: #77758a; font-size: 14px; line-height: 1.5; margin-bottom: 16px; }
+        .fee-upload-card input[type="file"] { display: block; margin-bottom: 14px; }
+        .fee-upload-card button {
+            border: 0; border-radius: 8px; padding: 11px 17px;
+            background: #713ce6; color: white; font-weight: bold; cursor: pointer;
+        }
+        .fee-upload-card button:hover { background: #5e2dc7; }
+        .upload-message, .upload-error { padding: 12px 15px; border-radius: 8px; margin: 15px 0; font-size: 14px; }
+        .upload-message { background: #eaf8ef; color: #216e39; }
+        .upload-error { background: #fff0f0; color: #a52b2b; }
+
+        /* RESPONSIVE */
+        @media (max-width: 700px) {
+
+            .sidebar {
+                width: 210px;
+            }
+
+            .main {
+                margin-left: 210px;
+                padding: 25px 20px;
+            }
+
+            .top-section {
+                align-items: flex-start;
+                gap: 15px;
+            }
+
+            .admin-badge {
+                display: none;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+
+        <div class="logo">
+            SectionSync
+        </div>
+
+        <div class="panel-name">
+            Administrator Panel
+        </div>
+
+
+        <!-- DASHBOARD -->
+        <a href="/admin/dashboard" class="active">
+            Dashboard
+        </a>
+
+
+        <!-- ADMIN PROFILE -->
+        <a href="/admin/profile">
+            Admin Profile
+        </a>
+
+<!-- STUDENT MANAGEMENT -->
+<div class="menu-title">
+    Student Management
+</div>
+
+<div class="submenu">
+    <a href="{{ url_for('student_management') }}">
+        Student Management
+    </a>
+
+</div>
+
+
+        <!-- SECTION MANAGEMENT -->
+        <div class="menu-title">
+            Section Management
+        </div>
+
+        <div class="submenu">
+
+            <a href="/admin/section-capacity">
+                Section Capacity
+            </a>
+
+            <a href="/admin/cgpa-constraints">
+                CGPA Constraints
+            </a>
+
+        </div>
+
+
+        <!-- OTHER ADMIN MODULES -->
+        <a href="/admin/preferences">
+            Student Preferences
+        </a>
+
+        <a href="/admin/allocation">
+            Final Allocation
+        </a>
+
+        <a href="/admin/subjects-faculty">
+            Subjects & Faculty
+        </a>
+
+        <a href="/admin/statistics">
+            Allocation Statistics
+        </a>
+
+
+        <!-- LOGOUT -->
+        <a href="/admin/login" class="logout">
+            Logout
+        </a>
+
+    </div>
+
+
+    <!-- MAIN CONTENT -->
+    <div class="main">
+
+        <!-- HEADER -->
+        <div class="top-section">
+
+            <div class="page-title">
+
+                <h1>
+                    Admin Dashboard
+                </h1>
+
+                <p>
+                    Manage students, sections, preferences and allocation
+                    through SectionSync.
+                </p>
+
+            </div>
+
+
+            <div class="admin-badge">
+                Administrator
+            </div>
+
+        </div>
+
+
+        {% if message %}<div class="upload-message">{{ message }}</div>{% endif %}
+        {% if error %}<div class="upload-error">{{ error }}</div>{% endif %}
+
+        <!-- WELCOME CARD -->
+        <div class="welcome-card">
+
+            <h2>
+                Welcome to SectionSync Admin Panel
+            </h2>
+
+            <p>
+                Manage student information, sections, preferences and
+                allocation from the administrator panel.
+            </p>
+
+        </div>
+
+        <section class="fee-upload-card">
+            <h2>Upload Fee Order IDs</h2>
+            <p>Upload an .xlsx workbook with an <strong>order_id</strong> column in the first row and one approved order ID per row. Students can use these IDs on the Fee Verification page.</p>
+            <form method="POST" action="/admin/dashboard" enctype="multipart/form-data">
+                <input type="file" name="excel_file" accept=".xlsx" required>
+                <button type="submit">Upload Order IDs</button>
+            </form>
+        </section>
+
+    </div>
+
+</body>
+</html>
+"""
