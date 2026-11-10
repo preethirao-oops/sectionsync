@@ -1,3 +1,753 @@
 """Python source for the student/profile.html page template."""
 
-TEMPLATE_SOURCE = '<!DOCTYPE html>\n<html lang="en">\n\n<head>\n\n    <meta charset="UTF-8">\n\n    <meta name="viewport"\n          content="width=device-width, initial-scale=1.0">\n\n    <title>My Profile - SectionSync</title>\n\n\n    <style>\n\n        * {\n            margin: 0;\n            padding: 0;\n            box-sizing: border-box;\n            font-family: Arial, sans-serif;\n        }\n\n\n        body {\n            background: #f7f7fb;\n            color: #25233d;\n        }\n\n\n        /* =========================\n           SIDEBAR\n        ========================= */\n\n        .sidebar {\n\n            position: fixed;\n            left: 0;\n            top: 0;\n\n            width: 250px;\n            height: 100vh;\n\n            background: #25233d;\n\n            padding: 25px 15px;\n\n            color: white;\n        }\n\n\n        .logo {\n            padding: 10px 15px 30px;\n        }\n\n\n        .logo h1 {\n            font-size: 25px;\n        }\n\n\n        .logo p {\n\n            font-size: 13px;\n\n            color: #b9b6c9;\n\n            margin-top: 5px;\n        }\n\n\n        .menu {\n            list-style: none;\n        }\n\n\n        .menu-item {\n            margin-bottom: 8px;\n        }\n\n\n        .menu-link {\n\n            display: flex;\n\n            align-items: center;\n\n            gap: 12px;\n\n            width: 100%;\n\n            padding: 13px 15px;\n\n            color: #ddd;\n\n            text-decoration: none;\n\n            border-radius: 8px;\n\n            background: transparent;\n\n            border: none;\n\n            cursor: pointer;\n\n            font-size: 15px;\n\n            text-align: left;\n        }\n\n\n        .menu-link:hover {\n\n            background: rgba(216, 197, 255, 0.12);\n        }\n\n\n        .menu-link.active {\n\n            background: #d8c5ff;\n\n            color: #25233d;\n        }\n\n\n        .icon {\n\n            width: 20px;\n\n            text-align: center;\n        }\n\n\n        /* =========================\n           SECTION DROPDOWN\n        ========================= */\n\n        .section-header {\n\n            display: flex;\n\n            align-items: center;\n\n            width: 100%;\n\n            gap: 12px;\n        }\n\n\n        .section-header span:nth-child(2) {\n\n            flex: 1;\n\n            text-align: left;\n        }\n\n\n        .arrow {\n            font-size: 13px;\n        }\n\n\n        .submenu {\n\n            display: block;\n\n            margin-left: 20px;\n\n            margin-top: 5px;\n        }\n\n\n        .submenu a {\n\n            display: block;\n\n            padding: 10px 12px;\n\n            color: #b9b6c9;\n\n            text-decoration: none;\n\n            font-size: 14px;\n\n            border-radius: 7px;\n        }\n\n\n        .submenu a:hover {\n\n            background: rgba(216, 197, 255, 0.1);\n\n            color: white;\n        }\n\n\n        /* =========================\n           LOGOUT\n        ========================= */\n\n        .logout {\n\n            position: absolute;\n\n            bottom: 25px;\n\n            left: 15px;\n\n            right: 15px;\n        }\n\n\n        /* =========================\n           MAIN CONTENT\n        ========================= */\n\n        .main {\n\n            margin-left: 250px;\n\n            min-height: 100vh;\n\n            padding: 40px;\n        }\n\n\n        .page-header {\n\n            margin-bottom: 30px;\n        }\n\n\n        .page-header h2 {\n\n            font-size: 28px;\n\n            margin-bottom: 8px;\n        }\n\n\n        .page-header p {\n\n            color: #777;\n\n            font-size: 15px;\n        }\n\n\n        /* =========================\n           PROFILE CARD\n        ========================= */\n\n        .profile-card {\n\n            background: white;\n\n            border: 1px solid #e7e5ef;\n\n            border-radius: 14px;\n\n            padding: 32px;\n\n            max-width: 950px;\n\n            box-shadow:\n                0 5px 20px rgba(37, 35, 61, 0.05);\n        }\n\n\n        /* =========================\n           PROFILE TOP\n        ========================= */\n\n        .profile-top {\n\n            display: flex;\n\n            align-items: center;\n\n            gap: 20px;\n\n            padding-bottom: 25px;\n\n            border-bottom: 1px solid #eeeeee;\n        }\n\n\n        .profile-avatar {\n\n            width: 65px;\n\n            height: 65px;\n\n            border-radius: 50%;\n\n            background: #e9ddff;\n\n            color: #713ce6;\n\n            display: flex;\n\n            align-items: center;\n\n            justify-content: center;\n\n            font-size: 26px;\n\n            font-weight: bold;\n        }\n\n\n        .profile-top h3 {\n\n            font-size: 23px;\n\n            margin-bottom: 5px;\n        }\n\n\n        .profile-top p {\n\n            color: #777;\n\n            font-size: 14px;\n        }\n\n\n        /* =========================\n           INFORMATION\n        ========================= */\n\n        .profile-grid {\n\n            display: grid;\n\n            grid-template-columns: 1fr 1fr;\n\n            gap: 20px;\n\n            margin-top: 28px;\n        }\n\n\n        .info-card {\n\n            padding: 20px;\n\n            background: #f8f7fc;\n\n            border: 1px solid #ebe9f2;\n\n            border-radius: 10px;\n        }\n\n\n        .info-label {\n\n            display: block;\n\n            color: #777;\n\n            font-size: 13px;\n\n            margin-bottom: 8px;\n        }\n\n\n        .info-value {\n\n            display: block;\n\n            color: #25233d;\n\n            font-size: 16px;\n\n            font-weight: 600;\n        }\n\n\n        /* =========================\n           MOBILE\n        ========================= */\n\n        @media (max-width: 800px) {\n\n            .sidebar {\n                width: 210px;\n            }\n\n            .main {\n\n                margin-left: 210px;\n\n                padding: 25px;\n            }\n\n            .profile-grid {\n\n                grid-template-columns: 1fr;\n            }\n        }\n\n    </style>\n\n</head>\n\n\n<body>\n\n\n    <!-- =================================\n         SIDEBAR\n    ================================== -->\n\n    <div class="sidebar">\n\n\n        <div class="logo">\n\n            <h1>SectionSync</h1>\n\n            <p>Student Portal</p>\n\n        </div>\n\n\n        <ul class="menu">\n\n\n            <!-- Dashboard -->\n\n            <li class="menu-item">\n\n                <a href="/student/dashboard"\n                   class="menu-link">\n\n                    <span class="icon">⌂</span>\n\n                    <span>Dashboard</span>\n\n                </a>\n\n            </li>\n\n\n            <!-- My Profile -->\n\n            <li class="menu-item">\n\n                <a href="/student/profile"\n                   class="menu-link active">\n\n                    <span class="icon">●</span>\n\n                    <span>My Profile</span>\n\n                </a>\n\n            </li>\n\n\n            <!-- Fee Verification -->\n\n            <li class="menu-item">\n\n                <a href="/student/fee-verification"\n                   class="menu-link">\n\n                    <span class="icon">▣</span>\n\n                    <span>Fee Verification</span>\n\n                </a>\n\n            </li>\n\n\n            <!-- Section Preferences -->\n\n            <li class="menu-item">\n\n\n                <button\n                    type="button"\n                    class="menu-link"\n                    onclick="toggleDropdown()"\n                >\n\n                    <div class="section-header">\n\n                        <span class="icon">▣</span>\n\n                        <span>Section Preferences</span>\n\n                        <span class="arrow"\n                              id="arrow">⌃</span>\n\n                    </div>\n\n                </button>\n\n\n                <div class="submenu"\n                     id="submenu">\n\n                    <a href="/student/live-basket-filling">\n\n                        Live Basket Filling\n\n                    </a>\n\n\n                    <a href="/student/section-preferences">\n\n                        Preferred Sections\n\n                    </a>\n\n                </div>\n\n            </li>\n\n\n            <!-- Allocation Status -->\n\n            <li class="menu-item">\n\n                <a href="/student/allocation-status"\n                   class="menu-link">\n\n                    <span class="icon">◔</span>\n\n                    <span>Allocation Status</span>\n\n                </a>\n\n            </li>\n\n\n        </ul>\n\n\n        <!-- Logout -->\n\n        <div class="logout">\n\n            <a href="/logout"\n               class="menu-link">\n\n                <span class="icon">↪</span>\n\n                <span>Logout</span>\n\n            </a>\n\n        </div>\n\n\n    </div>\n\n\n\n    <!-- =================================\n         MAIN CONTENT\n    ================================== -->\n\n    <div class="main">\n\n\n        <div class="page-header">\n\n            <h2>My Profile</h2>\n\n            <p>\n                View your personal and academic information\n            </p>\n\n        </div>\n\n\n\n        <div class="profile-card">\n\n\n            <!-- Profile Header -->\n\n            <div class="profile-top">\n\n\n                <div class="profile-avatar">\n\n                    {{ student["student_name"][0] }}\n\n                </div>\n\n\n                <div>\n\n                    <h3>\n                        {{ student["student_name"] }}\n                    </h3>\n\n                    <p>\n                        Student Profile\n                    </p>\n\n                </div>\n\n\n            </div>\n\n\n\n            <!-- Profile Information -->\n\n            <div class="profile-grid">\n\n\n                <!-- Enrollment Number -->\n\n                <div class="info-card">\n\n                    <span class="info-label">\n                        Enrollment Number\n                    </span>\n\n                    <span class="info-value">\n                        {{ student["enrollment_no"] }}\n                    </span>\n\n                </div>\n\n\n                <!-- Name -->\n\n                <div class="info-card">\n\n                    <span class="info-label">\n                        Name\n                    </span>\n\n                    <span class="info-value">\n                        {{ student["student_name"] }}\n                    </span>\n\n                </div>\n\n\n                <!-- DOB -->\n\n                <div class="info-card">\n\n                    <span class="info-label">\n                        Date of Birth\n                    </span>\n\n                    <span class="info-value">\n                        {{ student["dob"] or "Not available" }}\n                    </span>\n\n                </div>\n\n\n                <!-- Email -->\n\n                <div class="info-card">\n\n                    <span class="info-label">\n                        Email\n                    </span>\n\n                    <span class="info-value">\n                        {{ student["email"] or "Not available" }}\n                    </span>\n\n                </div>\n\n\n                <!-- Program -->\n\n                <div class="info-card">\n\n                    <span class="info-label">\n                        Program\n                    </span>\n\n                    <span class="info-value">\n                        {{ student["program"] }}\n                    </span>\n\n                </div>\n\n\n                <!-- Batch -->\n\n                <div class="info-card">\n\n                    <span class="info-label">\n                        Batch\n                    </span>\n\n                    <span class="info-value">\n                        {{ student["batch"] or "Not available" }}\n                    </span>\n\n                </div>\n\n\n            </div>\n\n\n        </div>\n\n\n    </div>\n\n\n\n    <script>\n\n        function toggleDropdown() {\n\n            const submenu =\n                document.getElementById("submenu");\n\n            const arrow =\n                document.getElementById("arrow");\n\n\n            if (submenu.style.display === "none") {\n\n                submenu.style.display = "block";\n\n                arrow.textContent = "⌃";\n\n            } else {\n\n                submenu.style.display = "none";\n\n                arrow.textContent = "⌄";\n\n            }\n\n        }\n\n    </script>\n\n\n</body>\n\n</html>\n'
+TEMPLATE_SOURCE = r"""<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>My Profile - SectionSync</title>
+
+
+    <style>
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+
+        body {
+            background: #f7f7fb;
+            color: #25233d;
+        }
+
+
+        /* =========================
+           SIDEBAR
+        ========================= */
+
+        .sidebar {
+
+            position: fixed;
+            left: 0;
+            top: 0;
+
+            width: 250px;
+            height: 100vh;
+
+            background: #25233d;
+
+            padding: 25px 15px;
+
+            color: white;
+        }
+
+
+        .logo {
+            padding: 10px 15px 30px;
+        }
+
+
+        .logo h1 {
+            font-size: 25px;
+        }
+
+
+        .logo p {
+
+            font-size: 13px;
+
+            color: #b9b6c9;
+
+            margin-top: 5px;
+        }
+
+
+        .menu {
+            list-style: none;
+        }
+
+
+        .menu-item {
+            margin-bottom: 8px;
+        }
+
+
+        .menu-link {
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 12px;
+
+            width: 100%;
+
+            padding: 13px 15px;
+
+            color: #ddd;
+
+            text-decoration: none;
+
+            border-radius: 8px;
+
+            background: transparent;
+
+            border: none;
+
+            cursor: pointer;
+
+            font-size: 15px;
+
+            text-align: left;
+        }
+
+
+        .menu-link:hover {
+
+            background: rgba(216, 197, 255, 0.12);
+        }
+
+
+        .menu-link.active {
+
+            background: #d8c5ff;
+
+            color: #25233d;
+        }
+
+
+        .icon {
+
+            width: 20px;
+
+            text-align: center;
+        }
+
+
+        /* =========================
+           SECTION DROPDOWN
+        ========================= */
+
+        .section-header {
+
+            display: flex;
+
+            align-items: center;
+
+            width: 100%;
+
+            gap: 12px;
+        }
+
+
+        .section-header span:nth-child(2) {
+
+            flex: 1;
+
+            text-align: left;
+        }
+
+
+        .arrow {
+            font-size: 13px;
+        }
+
+
+        .submenu {
+
+            display: block;
+
+            margin-left: 20px;
+
+            margin-top: 5px;
+        }
+
+
+        .submenu a {
+
+            display: block;
+
+            padding: 10px 12px;
+
+            color: #b9b6c9;
+
+            text-decoration: none;
+
+            font-size: 14px;
+
+            border-radius: 7px;
+        }
+
+
+        .submenu a:hover {
+
+            background: rgba(216, 197, 255, 0.1);
+
+            color: white;
+        }
+
+
+        /* =========================
+           LOGOUT
+        ========================= */
+
+        .logout {
+
+            position: absolute;
+
+            bottom: 25px;
+
+            left: 15px;
+
+            right: 15px;
+        }
+
+
+        /* =========================
+           MAIN CONTENT
+        ========================= */
+
+        .main {
+
+            margin-left: 250px;
+
+            min-height: 100vh;
+
+            padding: 40px;
+        }
+
+
+        .page-header {
+
+            margin-bottom: 30px;
+        }
+
+
+        .page-header h2 {
+
+            font-size: 28px;
+
+            margin-bottom: 8px;
+        }
+
+
+        .page-header p {
+
+            color: #777;
+
+            font-size: 15px;
+        }
+
+
+        /* =========================
+           PROFILE CARD
+        ========================= */
+
+        .profile-card {
+
+            background: white;
+
+            border: 1px solid #e7e5ef;
+
+            border-radius: 14px;
+
+            padding: 32px;
+
+            max-width: 950px;
+
+            box-shadow:
+                0 5px 20px rgba(37, 35, 61, 0.05);
+        }
+
+
+        /* =========================
+           PROFILE TOP
+        ========================= */
+
+        .profile-top {
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 20px;
+
+            padding-bottom: 25px;
+
+            border-bottom: 1px solid #eeeeee;
+        }
+
+
+        .profile-avatar {
+
+            width: 65px;
+
+            height: 65px;
+
+            border-radius: 50%;
+
+            background: #e9ddff;
+
+            color: #713ce6;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            font-size: 26px;
+
+            font-weight: bold;
+        }
+
+
+        .profile-top h3 {
+
+            font-size: 23px;
+
+            margin-bottom: 5px;
+        }
+
+
+        .profile-top p {
+
+            color: #777;
+
+            font-size: 14px;
+        }
+
+
+        /* =========================
+           INFORMATION
+        ========================= */
+
+        .profile-grid {
+
+            display: grid;
+
+            grid-template-columns: 1fr 1fr;
+
+            gap: 20px;
+
+            margin-top: 28px;
+        }
+
+
+        .info-card {
+
+            padding: 20px;
+
+            background: #f8f7fc;
+
+            border: 1px solid #ebe9f2;
+
+            border-radius: 10px;
+        }
+
+
+        .info-label {
+
+            display: block;
+
+            color: #777;
+
+            font-size: 13px;
+
+            margin-bottom: 8px;
+        }
+
+
+        .info-value {
+
+            display: block;
+
+            color: #25233d;
+
+            font-size: 16px;
+
+            font-weight: 600;
+        }
+
+
+        /* =========================
+           MOBILE
+        ========================= */
+
+        @media (max-width: 800px) {
+
+            .sidebar {
+                width: 210px;
+            }
+
+            .main {
+
+                margin-left: 210px;
+
+                padding: 25px;
+            }
+
+            .profile-grid {
+
+                grid-template-columns: 1fr;
+            }
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+    <!-- =================================
+         SIDEBAR
+    ================================== -->
+
+    <div class="sidebar">
+
+
+        <div class="logo">
+
+            <h1>SectionSync</h1>
+
+            <p>Student Portal</p>
+
+        </div>
+
+
+        <ul class="menu">
+
+
+            <!-- Dashboard -->
+
+            <li class="menu-item">
+
+                <a href="/student/dashboard"
+                   class="menu-link">
+
+                    <span class="icon">⌂</span>
+
+                    <span>Dashboard</span>
+
+                </a>
+
+            </li>
+
+
+            <!-- My Profile -->
+
+            <li class="menu-item">
+
+                <a href="/student/profile"
+                   class="menu-link active">
+
+                    <span class="icon">●</span>
+
+                    <span>My Profile</span>
+
+                </a>
+
+            </li>
+
+
+            <!-- Fee Verification -->
+
+            <li class="menu-item">
+
+                <a href="/student/fee-verification"
+                   class="menu-link">
+
+                    <span class="icon">▣</span>
+
+                    <span>Fee Verification</span>
+
+                </a>
+
+            </li>
+
+
+            <!-- Section Preferences -->
+
+            <li class="menu-item">
+
+
+                <button
+                    type="button"
+                    class="menu-link"
+                    onclick="toggleDropdown()"
+                >
+
+                    <div class="section-header">
+
+                        <span class="icon">▣</span>
+
+                        <span>Section Preferences</span>
+
+                        <span class="arrow"
+                              id="arrow">⌃</span>
+
+                    </div>
+
+                </button>
+
+
+                <div class="submenu"
+                     id="submenu">
+
+                    <a href="/student/live-basket-filling">
+
+                        Live Basket Filling
+
+                    </a>
+
+
+                    <a href="/student/section-preferences">
+
+                        Preferred Sections
+
+                    </a>
+
+                </div>
+
+            </li>
+
+
+            <!-- Allocation Status -->
+
+            <li class="menu-item">
+
+                <a href="/student/allocation-status"
+                   class="menu-link">
+
+                    <span class="icon">◔</span>
+
+                    <span>Allocation Status</span>
+
+                </a>
+
+            </li>
+
+
+        </ul>
+
+
+        <!-- Logout -->
+
+        <div class="logout">
+
+            <a href="/logout"
+               class="menu-link">
+
+                <span class="icon">↪</span>
+
+                <span>Logout</span>
+
+            </a>
+
+        </div>
+
+
+    </div>
+
+
+
+    <!-- =================================
+         MAIN CONTENT
+    ================================== -->
+
+    <div class="main">
+
+
+        <div class="page-header">
+
+            <h2>My Profile</h2>
+
+            <p>
+                View your personal and academic information
+            </p>
+
+        </div>
+
+
+
+        <div class="profile-card">
+
+
+            <!-- Profile Header -->
+
+            <div class="profile-top">
+
+
+                <div class="profile-avatar">
+
+                    {{ student["student_name"][0] }}
+
+                </div>
+
+
+                <div>
+
+                    <h3>
+                        {{ student["student_name"] }}
+                    </h3>
+
+                    <p>
+                        Student Profile
+                    </p>
+
+                </div>
+
+
+            </div>
+
+
+
+            <!-- Profile Information -->
+
+            <div class="profile-grid">
+
+
+                <!-- Enrollment Number -->
+
+                <div class="info-card">
+
+                    <span class="info-label">
+                        Enrollment Number
+                    </span>
+
+                    <span class="info-value">
+                        {{ student["enrollment_no"] }}
+                    </span>
+
+                </div>
+
+
+                <!-- Name -->
+
+                <div class="info-card">
+
+                    <span class="info-label">
+                        Name
+                    </span>
+
+                    <span class="info-value">
+                        {{ student["student_name"] }}
+                    </span>
+
+                </div>
+
+
+                <!-- DOB -->
+
+                <div class="info-card">
+
+                    <span class="info-label">
+                        Date of Birth
+                    </span>
+
+                    <span class="info-value">
+                        {{ student["dob"] or "Not available" }}
+                    </span>
+
+                </div>
+
+
+                <!-- Email -->
+
+                <div class="info-card">
+
+                    <span class="info-label">
+                        Email
+                    </span>
+
+                    <span class="info-value">
+                        {{ student["email"] or "Not available" }}
+                    </span>
+
+                </div>
+
+
+                <!-- Program -->
+
+                <div class="info-card">
+
+                    <span class="info-label">
+                        Program
+                    </span>
+
+                    <span class="info-value">
+                        {{ student["program"] }}
+                    </span>
+
+                </div>
+
+
+                <!-- Batch -->
+
+                <div class="info-card">
+
+                    <span class="info-label">
+                        Batch
+                    </span>
+
+                    <span class="info-value">
+                        {{ student["batch"] or "Not available" }}
+                    </span>
+
+                </div>
+
+
+            </div>
+
+
+        </div>
+
+
+    </div>
+
+
+
+    <script>
+
+        function toggleDropdown() {
+
+            const submenu =
+                document.getElementById("submenu");
+
+            const arrow =
+                document.getElementById("arrow");
+
+
+            if (submenu.style.display === "none") {
+
+                submenu.style.display = "block";
+
+                arrow.textContent = "⌃";
+
+            } else {
+
+                submenu.style.display = "none";
+
+                arrow.textContent = "⌄";
+
+            }
+
+        }
+
+    </script>
+
+
+</body>
+
+</html>
+"""
