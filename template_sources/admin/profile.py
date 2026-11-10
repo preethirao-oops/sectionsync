@@ -1,3 +1,373 @@
 """Python source for the admin/profile.html page template."""
 
-TEMPLATE_SOURCE = '<!DOCTYPE html>\n<html lang="en">\n<head>\n    <meta charset="UTF-8">\n    <meta name="viewport" content="width=device-width, initial-scale=1.0">\n\n    <title>Admin Profile - SectionSync</title>\n\n    <style>\n        * {\n            margin: 0;\n            padding: 0;\n            box-sizing: border-box;\n            font-family: Arial, sans-serif;\n        }\n\n        body {\n            background: #f7f7fb;\n            color: #27263a;\n        }\n\n        /* SIDEBAR */\n        .sidebar {\n            position: fixed;\n            left: 0;\n            top: 0;\n            width: 250px;\n            height: 100vh;\n            background: #25233d;\n            color: white;\n            padding: 25px 15px;\n            overflow-y: auto;\n        }\n\n        .logo {\n            font-size: 25px;\n            font-weight: bold;\n            text-align: center;\n            margin-bottom: 8px;\n        }\n\n        .panel-name {\n            text-align: center;\n            color: #bdb9d2;\n            font-size: 13px;\n            margin-bottom: 30px;\n        }\n\n        .menu-title {\n            color: #9692ad;\n            font-size: 11px;\n            font-weight: bold;\n            text-transform: uppercase;\n            margin: 18px 10px 8px;\n        }\n\n        .sidebar a {\n            display: block;\n            text-decoration: none;\n            color: #d8d5e4;\n            padding: 11px 14px;\n            margin: 3px 0;\n            border-radius: 8px;\n            font-size: 14px;\n            transition: 0.2s;\n        }\n\n        .sidebar a:hover {\n            background: #353250;\n            color: white;\n        }\n\n        .sidebar a.active {\n            background: #d8c5ff;\n            color: #25233d;\n            font-weight: bold;\n        }\n\n        .submenu a {\n            padding-left: 32px;\n            font-size: 13px;\n        }\n\n        .logout {\n            margin-top: 25px !important;\n            color: #ffb6b6 !important;\n        }\n\n        /* MAIN */\n        .main {\n            margin-left: 250px;\n            padding: 35px 40px;\n            min-height: 100vh;\n        }\n\n        .page-title {\n            margin-bottom: 30px;\n        }\n\n        .page-title h1 {\n            font-size: 28px;\n            margin-bottom: 7px;\n        }\n\n        .page-title p {\n            color: #77758a;\n            font-size: 14px;\n        }\n\n        /* PROFILE CARD */\n        .profile-card {\n            background: white;\n            border: 1px solid #e7e4ef;\n            border-radius: 16px;\n            padding: 30px;\n            max-width: 800px;\n        }\n\n        .profile-header {\n            display: flex;\n            align-items: center;\n            gap: 20px;\n            padding-bottom: 25px;\n            border-bottom: 1px solid #eceaf2;\n            margin-bottom: 25px;\n        }\n\n        .profile-icon {\n            width: 70px;\n            height: 70px;\n            border-radius: 50%;\n            background: #eee6ff;\n            color: #713ce6;\n            display: flex;\n            align-items: center;\n            justify-content: center;\n            font-size: 30px;\n            font-weight: bold;\n        }\n\n        .profile-header h2 {\n            font-size: 21px;\n            margin-bottom: 6px;\n        }\n\n        .profile-header p {\n            color: #77758a;\n            font-size: 13px;\n        }\n\n        /* DETAILS */\n        .details {\n            display: grid;\n            grid-template-columns: 1fr 1fr;\n            gap: 20px;\n        }\n\n        .detail-box {\n            background: #f8f7fc;\n            border-radius: 10px;\n            padding: 17px;\n        }\n\n        .detail-box label {\n            display: block;\n            color: #858296;\n            font-size: 12px;\n            margin-bottom: 7px;\n        }\n\n        .detail-box p {\n            color: #302e43;\n            font-size: 15px;\n            font-weight: 600;\n        }\n\n        @media (max-width: 700px) {\n\n            .sidebar {\n                width: 210px;\n            }\n\n            .main {\n                margin-left: 210px;\n                padding: 25px 20px;\n            }\n\n            .details {\n                grid-template-columns: 1fr;\n            }\n        }\n    </style>\n</head>\n\n<body>\n\n    <!-- SIDEBAR -->\n    <div class="sidebar">\n\n        <div class="logo">\n            SectionSync\n        </div>\n\n        <div class="panel-name">\n            Administrator Panel\n        </div>\n\n\n        <a href="/admin/dashboard">\n            Dashboard\n        </a>\n\n\n        <a href="/admin/profile" class="active">\n            Admin Profile\n        </a>\n\n\n        <div class="menu-title">\n            Student Management\n        </div>\n\n        <div class="submenu">\n\n            \n            <a href="{{ url_for(\'student_management\') }}">\n                Student Management\n            </a>\n        </div>\n\n\n        <div class="menu-title">\n            Section Management\n        </div>\n\n        <div class="submenu">\n\n            <a href="/admin/section-capacity">\n                Section Capacity\n            </a>\n\n            <a href="/admin/cgpa-constraints">\n                CGPA Constraints\n            </a>\n\n        </div>\n\n\n        <a href="/admin/preferences">\n            Student Preferences\n        </a>\n\n        <a href="/admin/allocation">\n            Final Allocation\n        </a>\n\n        <a href="/admin/subjects-faculty">\n            Subjects & Faculty\n        </a>\n\n        <a href="/admin/statistics">\n            Allocation Statistics\n        </a>\n\n\n        <a href="/admin/login" class="logout">\n            Logout\n        </a>\n\n    </div>\n\n\n    <!-- MAIN CONTENT -->\n    <div class="main">\n\n        <div class="page-title">\n\n            <h1>\n                Admin Profile\n            </h1>\n\n            <p>\n                View administrator account information.\n            </p>\n\n        </div>\n\n\n        <div class="profile-card">\n\n            <div class="profile-header">\n\n                <div class="profile-icon">\n                    A\n                </div>\n\n                <div>\n                    <h2>\n                        {{ admin["admin_name"] }}\n                    </h2>\n\n                    <p>\n                        SectionSync Administrator\n                    </p>\n                </div>\n\n            </div>\n\n\n            <div class="details">\n\n                <div class="detail-box">\n\n                    <label>\n                        Administrator Name\n                    </label>\n\n                    <p>\n                        {{ admin["admin_name"] }}\n                    </p>\n\n                </div>\n\n\n                <div class="detail-box">\n\n                    <label>\n                        Administrator ID\n                    </label>\n\n                    <p>\n                        {{ admin["admin_id"] }}\n                    </p>\n\n                </div>\n\n\n                <div class="detail-box">\n\n                    <label>\n                        Email Address\n                    </label>\n\n                    <p>\n                        {{ admin["email"] }}\n                    </p>\n\n                </div>\n\n\n                <div class="detail-box">\n\n                    <label>\n                        Role\n                    </label>\n\n                    <p>\n                        Administrator\n                    </p>\n\n                </div>\n\n            </div>\n\n        </div>\n\n    </div>\n\n</body>\n</html>\n'
+TEMPLATE_SOURCE = r"""<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Admin Profile - SectionSync</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background: #f7f7fb;
+            color: #27263a;
+        }
+
+        /* SIDEBAR */
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 250px;
+            height: 100vh;
+            background: #25233d;
+            color: white;
+            padding: 25px 15px;
+            overflow-y: auto;
+        }
+
+        .logo {
+            font-size: 25px;
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 8px;
+        }
+
+        .panel-name {
+            text-align: center;
+            color: #bdb9d2;
+            font-size: 13px;
+            margin-bottom: 30px;
+        }
+
+        .menu-title {
+            color: #9692ad;
+            font-size: 11px;
+            font-weight: bold;
+            text-transform: uppercase;
+            margin: 18px 10px 8px;
+        }
+
+        .sidebar a {
+            display: block;
+            text-decoration: none;
+            color: #d8d5e4;
+            padding: 11px 14px;
+            margin: 3px 0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: 0.2s;
+        }
+
+        .sidebar a:hover {
+            background: #353250;
+            color: white;
+        }
+
+        .sidebar a.active {
+            background: #d8c5ff;
+            color: #25233d;
+            font-weight: bold;
+        }
+
+        .submenu a {
+            padding-left: 32px;
+            font-size: 13px;
+        }
+
+        .logout {
+            margin-top: 25px !important;
+            color: #ffb6b6 !important;
+        }
+
+        /* MAIN */
+        .main {
+            margin-left: 250px;
+            padding: 35px 40px;
+            min-height: 100vh;
+        }
+
+        .page-title {
+            margin-bottom: 30px;
+        }
+
+        .page-title h1 {
+            font-size: 28px;
+            margin-bottom: 7px;
+        }
+
+        .page-title p {
+            color: #77758a;
+            font-size: 14px;
+        }
+
+        /* PROFILE CARD */
+        .profile-card {
+            background: white;
+            border: 1px solid #e7e4ef;
+            border-radius: 16px;
+            padding: 30px;
+            max-width: 800px;
+        }
+
+        .profile-header {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            padding-bottom: 25px;
+            border-bottom: 1px solid #eceaf2;
+            margin-bottom: 25px;
+        }
+
+        .profile-icon {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            background: #eee6ff;
+            color: #713ce6;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 30px;
+            font-weight: bold;
+        }
+
+        .profile-header h2 {
+            font-size: 21px;
+            margin-bottom: 6px;
+        }
+
+        .profile-header p {
+            color: #77758a;
+            font-size: 13px;
+        }
+
+        /* DETAILS */
+        .details {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .detail-box {
+            background: #f8f7fc;
+            border-radius: 10px;
+            padding: 17px;
+        }
+
+        .detail-box label {
+            display: block;
+            color: #858296;
+            font-size: 12px;
+            margin-bottom: 7px;
+        }
+
+        .detail-box p {
+            color: #302e43;
+            font-size: 15px;
+            font-weight: 600;
+        }
+
+        @media (max-width: 700px) {
+
+            .sidebar {
+                width: 210px;
+            }
+
+            .main {
+                margin-left: 210px;
+                padding: 25px 20px;
+            }
+
+            .details {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+
+        <div class="logo">
+            SectionSync
+        </div>
+
+        <div class="panel-name">
+            Administrator Panel
+        </div>
+
+
+        <a href="/admin/dashboard">
+            Dashboard
+        </a>
+
+
+        <a href="/admin/profile" class="active">
+            Admin Profile
+        </a>
+
+
+        <div class="menu-title">
+            Student Management
+        </div>
+
+        <div class="submenu">
+
+            
+            <a href="{{ url_for('student_management') }}">
+                Student Management
+            </a>
+        </div>
+
+
+        <div class="menu-title">
+            Section Management
+        </div>
+
+        <div class="submenu">
+
+            <a href="/admin/section-capacity">
+                Section Capacity
+            </a>
+
+            <a href="/admin/cgpa-constraints">
+                CGPA Constraints
+            </a>
+
+        </div>
+
+
+        <a href="/admin/preferences">
+            Student Preferences
+        </a>
+
+        <a href="/admin/allocation">
+            Final Allocation
+        </a>
+
+        <a href="/admin/subjects-faculty">
+            Subjects & Faculty
+        </a>
+
+        <a href="/admin/statistics">
+            Allocation Statistics
+        </a>
+
+
+        <a href="/admin/login" class="logout">
+            Logout
+        </a>
+
+    </div>
+
+
+    <!-- MAIN CONTENT -->
+    <div class="main">
+
+        <div class="page-title">
+
+            <h1>
+                Admin Profile
+            </h1>
+
+            <p>
+                View administrator account information.
+            </p>
+
+        </div>
+
+
+        <div class="profile-card">
+
+            <div class="profile-header">
+
+                <div class="profile-icon">
+                    A
+                </div>
+
+                <div>
+                    <h2>
+                        {{ admin["admin_name"] }}
+                    </h2>
+
+                    <p>
+                        SectionSync Administrator
+                    </p>
+                </div>
+
+            </div>
+
+
+            <div class="details">
+
+                <div class="detail-box">
+
+                    <label>
+                        Administrator Name
+                    </label>
+
+                    <p>
+                        {{ admin["admin_name"] }}
+                    </p>
+
+                </div>
+
+
+                <div class="detail-box">
+
+                    <label>
+                        Administrator ID
+                    </label>
+
+                    <p>
+                        {{ admin["admin_id"] }}
+                    </p>
+
+                </div>
+
+
+                <div class="detail-box">
+
+                    <label>
+                        Email Address
+                    </label>
+
+                    <p>
+                        {{ admin["email"] }}
+                    </p>
+
+                </div>
+
+
+                <div class="detail-box">
+
+                    <label>
+                        Role
+                    </label>
+
+                    <p>
+                        Administrator
+                    </p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</body>
+</html>
+"""
