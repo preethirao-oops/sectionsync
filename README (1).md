@@ -7,8 +7,9 @@ SectionSync is a Flask application for managing students, programs, section capa
 **Live demo:** [https://sectionsync-z5dw.onrender.com](https://sectionsync-z5dw.onrender.com)
 
 ## GitHub repository
+https://github.com/preethirao-oops/sectionsync
 
-[https://github.com/preethirao-oops/Multi-Section-Managment](https://github.com/preethirao-oops/Multi-Section-Managment)
+
 
 ## Features
 
