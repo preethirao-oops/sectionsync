@@ -1,3 +1,683 @@
 """Python source for the student/live_basket_filling.html page template."""
 
-TEMPLATE_SOURCE = '<!DOCTYPE html>\n<html lang="en">\n<head>\n    <meta charset="UTF-8">\n    <meta name="viewport" content="width=device-width, initial-scale=1.0">\n\n    <title>Live Basket Filling - SectionSync</title>\n\n    <style>\n        * {\n            margin: 0;\n            padding: 0;\n            box-sizing: border-box;\n        }\n\n        body {\n            font-family: Arial, Helvetica, sans-serif;\n            background: #f7f7fb;\n            color: #17203b;\n        }\n\n        /* ================= SIDEBAR ================= */\n\n        .sidebar {\n            position: fixed;\n            left: 0;\n            top: 0;\n            width: 240px;\n            height: 100vh;\n            background: #25233d;\n            color: white;\n            padding: 30px 14px;\n        }\n\n        .logo {\n            padding-left: 13px;\n            margin-bottom: 30px;\n        }\n\n        .logo h1 {\n            font-size: 25px;\n            margin-bottom: 5px;\n        }\n\n        .logo p {\n            font-size: 13px;\n            color: #d4d0e8;\n        }\n\n        .menu {\n            list-style: none;\n        }\n\n        .menu-item {\n            margin-bottom: 8px;\n        }\n\n        .menu-link {\n            width: 100%;\n            display: flex;\n            align-items: center;\n            gap: 15px;\n            padding: 15px 18px;\n            border-radius: 9px;\n            text-decoration: none;\n            color: white;\n            font-size: 14px;\n            font-weight: 600;\n            cursor: pointer;\n            border: none;\n            background: transparent;\n            text-align: left;\n        }\n\n        .menu-link:hover {\n            background: #302d4b;\n        }\n\n        .icon {\n            width: 20px;\n            text-align: center;\n        }\n\n        /* Section Preferences */\n\n        .section-header {\n            display: flex;\n            align-items: center;\n            width: 100%;\n        }\n\n        .section-header .arrow {\n            margin-left: auto;\n            font-size: 10px;\n        }\n\n        .submenu {\n            display: block;\n            margin-left: 33px;\n            border-left: 1px solid #57536d;\n            padding-left: 10px;\n        }\n\n        .submenu a {\n            display: block;\n            color: #eeeeF5;\n            text-decoration: none;\n            padding: 10px;\n            font-size: 13px;\n            border-radius: 5px;\n        }\n\n        .submenu a:hover {\n            background: #302d4b;\n        }\n\n        .submenu a.active-sub {\n            background: #302d4b;\n            color: white;\n        }\n\n        /* Logout */\n\n        .logout {\n            position: absolute;\n            bottom: 25px;\n            left: 14px;\n            right: 14px;\n        }\n\n        /* ================= MAIN ================= */\n\n        .main {\n            margin-left: 240px;\n            min-height: 100vh;\n        }\n\n        /* ================= TOP BAR ================= */\n\n        .topbar {\n            height: 70px;\n            background: white;\n            display: flex;\n            align-items: center;\n            justify-content: flex-end;\n            padding: 0 28px;\n            border-bottom: 1px solid #e5e3eb;\n        }\n\n        .profile-area {\n            display: flex;\n            align-items: center;\n            gap: 12px;\n        }\n\n        .notification {\n            width: 20px;\n            height: 20px;\n            background: #e23851;\n            border-radius: 50%;\n            margin-right: 15px;\n        }\n\n        .avatar {\n            width: 44px;\n            height: 44px;\n            border-radius: 50%;\n            background: #eeeafc;\n            display: flex;\n            justify-content: center;\n            align-items: center;\n            font-size: 21px;\n        }\n\n        .user-name {\n            font-size: 14px;\n            font-weight: bold;\n        }\n\n        .user-id {\n            font-size: 12px;\n            color: #71809b;\n            margin-top: 3px;\n        }\n\n        /* ================= CONTENT ================= */\n\n        .content {\n            padding: 30px 35px;\n        }\n\n        .page-title {\n            margin-bottom: 25px;\n        }\n\n        .page-title h1 {\n            font-size: 28px;\n            color: #172b51;\n            margin-bottom: 7px;\n        }\n\n        .page-title p {\n            font-size: 14px;\n            color: #71809b;\n        }\n\n        /* ================= LIVE BOX ================= */\n\n        .live-box {\n            background: white;\n            border: 1px solid #e2dfea;\n            border-radius: 13px;\n            padding: 22px;\n            margin-bottom: 20px;\n\n            display: flex;\n            align-items: center;\n            justify-content: space-between;\n        }\n\n        .live-left {\n            display: flex;\n            align-items: center;\n            gap: 14px;\n        }\n\n        .live-icon {\n            width: 42px;\n            height: 42px;\n            border-radius: 9px;\n            background: #eee8ff;\n\n            display: flex;\n            align-items: center;\n            justify-content: center;\n\n            color: #713ce6;\n            font-size: 19px;\n        }\n\n        .live-title {\n            font-size: 15px;\n            font-weight: bold;\n            margin-bottom: 5px;\n        }\n\n        .live-text {\n            font-size: 12px;\n            color: #71809b;\n        }\n\n        .live-status {\n            color: #15966a;\n            background: #e7f6ef;\n            padding: 7px 12px;\n            border-radius: 15px;\n            font-size: 11px;\n            font-weight: bold;\n        }\n\n        /* ================= SECTION TABLE ================= */\n\n        .panel {\n            background: white;\n            border: 1px solid #e2dfea;\n            border-radius: 13px;\n            overflow: hidden;\n        }\n\n        .panel-header {\n            padding: 20px 22px;\n            border-bottom: 1px solid #e8e5ee;\n        }\n\n        .panel-header h3 {\n            font-size: 16px;\n        }\n\n        .panel-header p {\n            margin-top: 6px;\n            font-size: 12px;\n            color: #71809b;\n        }\n\n        .section-row {\n            display: grid;\n            grid-template-columns: 1fr 1.4fr 1fr 1.2fr 1fr;\n\n            align-items: center;\n\n            padding: 17px 22px;\n\n            border-bottom: 1px solid #eeeef3;\n\n            font-size: 13px;\n        }\n\n        .section-row:last-child {\n            border-bottom: none;\n        }\n\n        .section-name {\n            font-weight: bold;\n        }\n\n        .program {\n            color: #59657d;\n        }\n\n        .capacity {\n            color: #71809b;\n        }\n\n        /* ================= PROGRESS ================= */\n\n        .progress-container {\n            width: 130px;\n        }\n\n        .progress {\n            height: 7px;\n            background: #eeeaf5;\n            border-radius: 10px;\n            overflow: hidden;\n        }\n\n        .progress-bar {\n            height: 100%;\n            background: #7845e8;\n            border-radius: 10px;\n        }\n\n        .filled {\n            font-size: 11px;\n            color: #71809b;\n            margin-top: 5px;\n        }\n\n        /* ================= STATUS ================= */\n\n        .status {\n            color: #15966a;\n            font-size: 11px;\n            font-weight: bold;\n        }\n\n        .almost-full {\n            color: #d98b00;\n        }\n\n        /* ================= RESPONSIVE ================= */\n\n        @media (max-width: 1000px) {\n\n            .sidebar {\n                width: 210px;\n            }\n\n            .main {\n                margin-left: 210px;\n            }\n\n            .section-row {\n                grid-template-columns: 1fr 1fr 1fr;\n                gap: 12px;\n            }\n        }\n\n        @media (max-width: 700px) {\n\n            .sidebar {\n                position: relative;\n                width: 100%;\n                height: auto;\n            }\n\n            .main {\n                margin-left: 0;\n            }\n\n            .logout {\n                position: static;\n                margin-top: 15px;\n            }\n\n            .content {\n                padding: 20px;\n            }\n\n            .section-row {\n                grid-template-columns: 1fr 1fr;\n            }\n\n            .topbar {\n                justify-content: center;\n            }\n        }\n\n        @media (max-width: 500px) {\n\n            .section-row {\n                grid-template-columns: 1fr;\n            }\n\n            .live-box {\n                flex-direction: column;\n                align-items: flex-start;\n                gap: 15px;\n            }\n        }\n    </style>\n</head>\n\n<body>\n\n<!-- =====================================================\n     SIDEBAR\n===================================================== -->\n\n<div class="sidebar">\n\n    <div class="logo">\n        <h1>SectionSync</h1>\n        <p>Student Portal</p>\n    </div>\n\n    <ul class="menu">\n\n        <!-- Dashboard -->\n        <li class="menu-item">\n            <a href="/student/dashboard" class="menu-link">\n                <span class="icon">⌂</span>\n                <span>Dashboard</span>\n            </a>\n        </li>\n\n        <!-- Profile -->\n        <li class="menu-item">\n            <a href="/student/profile" class="menu-link">\n                <span class="icon">●</span>\n                <span>My Profile</span>\n            </a>\n        </li>\n\n        <!-- Fee Verification -->\n        <li class="menu-item">\n            <a href="/student/fee-verification" class="menu-link">\n                <span class="icon">▣</span>\n                <span>Fee Verification</span>\n            </a>\n        </li>\n\n        <!-- Section Preferences -->\n        <li class="menu-item">\n\n            <div class="menu-link">\n\n                <div class="section-header">\n\n                    <span class="icon">▣</span>\n\n                    <span>Section Preferences</span>\n\n                    <span class="arrow">⌃</span>\n\n                </div>\n\n            </div>\n\n            <div class="submenu">\n\n                <a href="/student/live-basket-filling" \n                    class="active-sub">\n\n                    Live Basket Filling\n\n                </a>\n\n                <a href="/student/section-preferences">\n                    Preferred Sections\n\n                </a>\n\n            </div>\n\n        </li>\n\n        <!-- Allocation Status -->\n        <li class="menu-item">\n\n            <a href="/student/allocation-status"\n               class="menu-link">\n\n                <span class="icon">◔</span>\n\n                <span>Allocation Status</span>\n\n            </a>\n\n        </li>\n\n    </ul>\n\n\n    <!-- Logout -->\n\n    <div class="logout">\n\n        <a href="/logout"\n           class="menu-link">\n\n            <span class="icon">↪</span>\n\n            <span>Logout</span>\n\n        </a>\n\n    </div>\n\n</div>\n\n\n<!-- =====================================================\n     MAIN\n===================================================== -->\n\n<div class="main">\n\n\n    <!-- TOP BAR -->\n\n    <div class="topbar">\n\n        <div class="profile-area">\n\n            <div class="notification"></div>\n\n            <div class="avatar">\n                👤\n            </div>\n\n            <div>\n\n                <div class="user-name">\n                    {{ student[\'student_name\'] }}\n                </div>\n\n                <div class="user-id">\n                    {{ student[\'enrollment_no\'] }}\n                </div>\n\n            </div>\n\n            <span>▼</span>\n\n        </div>\n\n    </div>\n\n\n    <!-- =================================================\n         CONTENT\n    ================================================= -->\n\n    <div class="content">\n\n\n        <!-- PAGE TITLE -->\n\n        <div class="page-title">\n\n            <h1>Live Basket Filling</h1>\n\n            <p>\n                View the current seat availability of all sections.\n            </p>\n\n        </div>\n\n\n        <!-- LIVE STATUS -->\n\n        <div class="live-box">\n\n            <div class="live-left">\n\n                <div class="live-icon">\n                    ◉\n                </div>\n\n                <div>\n\n                    <div class="live-title">\n                        Live Section Availability\n                    </div>\n\n                    <div class="live-text">\n                        Seat availability is updated as students fill\n                        their section preferences.\n                    </div>\n\n                </div>\n\n            </div>\n\n\n            <div class="live-status">\n                ● LIVE\n            </div>\n\n        </div>\n\n\n        <!-- =================================================\n             ALL SECTIONS A-O\n        ================================================= -->\n\n        <div class="panel">\n\n\n            <div class="panel-header">\n\n                <h3>\n                    Current Section Capacity\n                </h3>\n\n                <p>\n                    All sections are visible. Availability is shown\n                    for information before preference submission.\n                </p>\n\n            </div>\n\n\n            <!-- TABLE HEADER -->\n\n            <div class="section-row">\n\n                <strong>Section</strong>\n\n                <strong>Program</strong>\n\n                <strong>Capacity</strong>\n\n                <strong>Filled</strong>\n\n                <strong>Status</strong>\n\n            </div>\n\n\n            {% for section in sections %}\n            <div class="section-row">\n                <div class="section-name">{{ section[\'section_name\'] }}</div>\n                <div class="program">{{ section[\'program\'] }}</div>\n                <div class="capacity">{{ section[\'capacity\'] }} seats</div>\n                <div class="progress-container">\n                    <div class="progress">\n                        <div class="progress-bar" style="width:{{ section[\'percent\'] }}%;"></div>\n                    </div>\n                    <div class="filled">{{ section[\'filled\'] }} / {{ section[\'capacity\'] }} filled</div>\n                </div>\n                <div class="status {% if section[\'status\'] == \'Almost Full\' or section[\'status\'] == \'Full\' %}almost-full{% endif %}">\n                    {{ section[\'status\'] }}\n                </div>\n            </div>\n            {% else %}\n            <div class="section-row">\n                <div class="empty">No section capacities have been configured yet.</div>\n            </div>\n            {% endfor %}\n\n        </div>\n\n    </div>\n\n</div>\n\n</body>\n</html>\n'
+TEMPLATE_SOURCE = r"""<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Live Basket Filling - SectionSync</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            background: #f7f7fb;
+            color: #17203b;
+        }
+
+        /* ================= SIDEBAR ================= */
+
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 240px;
+            height: 100vh;
+            background: #25233d;
+            color: white;
+            padding: 30px 14px;
+        }
+
+        .logo {
+            padding-left: 13px;
+            margin-bottom: 30px;
+        }
+
+        .logo h1 {
+            font-size: 25px;
+            margin-bottom: 5px;
+        }
+
+        .logo p {
+            font-size: 13px;
+            color: #d4d0e8;
+        }
+
+        .menu {
+            list-style: none;
+        }
+
+        .menu-item {
+            margin-bottom: 8px;
+        }
+
+        .menu-link {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px 18px;
+            border-radius: 9px;
+            text-decoration: none;
+            color: white;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            background: transparent;
+            text-align: left;
+        }
+
+        .menu-link:hover {
+            background: #302d4b;
+        }
+
+        .icon {
+            width: 20px;
+            text-align: center;
+        }
+
+        /* Section Preferences */
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            width: 100%;
+        }
+
+        .section-header .arrow {
+            margin-left: auto;
+            font-size: 10px;
+        }
+
+        .submenu {
+            display: block;
+            margin-left: 33px;
+            border-left: 1px solid #57536d;
+            padding-left: 10px;
+        }
+
+        .submenu a {
+            display: block;
+            color: #eeeeF5;
+            text-decoration: none;
+            padding: 10px;
+            font-size: 13px;
+            border-radius: 5px;
+        }
+
+        .submenu a:hover {
+            background: #302d4b;
+        }
+
+        .submenu a.active-sub {
+            background: #302d4b;
+            color: white;
+        }
+
+        /* Logout */
+
+        .logout {
+            position: absolute;
+            bottom: 25px;
+            left: 14px;
+            right: 14px;
+        }
+
+        /* ================= MAIN ================= */
+
+        .main {
+            margin-left: 240px;
+            min-height: 100vh;
+        }
+
+        /* ================= TOP BAR ================= */
+
+        .topbar {
+            height: 70px;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding: 0 28px;
+            border-bottom: 1px solid #e5e3eb;
+        }
+
+        .profile-area {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .notification {
+            width: 20px;
+            height: 20px;
+            background: #e23851;
+            border-radius: 50%;
+            margin-right: 15px;
+        }
+
+        .avatar {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: #eeeafc;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 21px;
+        }
+
+        .user-name {
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        .user-id {
+            font-size: 12px;
+            color: #71809b;
+            margin-top: 3px;
+        }
+
+        /* ================= CONTENT ================= */
+
+        .content {
+            padding: 30px 35px;
+        }
+
+        .page-title {
+            margin-bottom: 25px;
+        }
+
+        .page-title h1 {
+            font-size: 28px;
+            color: #172b51;
+            margin-bottom: 7px;
+        }
+
+        .page-title p {
+            font-size: 14px;
+            color: #71809b;
+        }
+
+        /* ================= LIVE BOX ================= */
+
+        .live-box {
+            background: white;
+            border: 1px solid #e2dfea;
+            border-radius: 13px;
+            padding: 22px;
+            margin-bottom: 20px;
+
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .live-left {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .live-icon {
+            width: 42px;
+            height: 42px;
+            border-radius: 9px;
+            background: #eee8ff;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            color: #713ce6;
+            font-size: 19px;
+        }
+
+        .live-title {
+            font-size: 15px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .live-text {
+            font-size: 12px;
+            color: #71809b;
+        }
+
+        .live-status {
+            color: #15966a;
+            background: #e7f6ef;
+            padding: 7px 12px;
+            border-radius: 15px;
+            font-size: 11px;
+            font-weight: bold;
+        }
+
+        /* ================= SECTION TABLE ================= */
+
+        .panel {
+            background: white;
+            border: 1px solid #e2dfea;
+            border-radius: 13px;
+            overflow: hidden;
+        }
+
+        .panel-header {
+            padding: 20px 22px;
+            border-bottom: 1px solid #e8e5ee;
+        }
+
+        .panel-header h3 {
+            font-size: 16px;
+        }
+
+        .panel-header p {
+            margin-top: 6px;
+            font-size: 12px;
+            color: #71809b;
+        }
+
+        .section-row {
+            display: grid;
+            grid-template-columns: 1fr 1.4fr 1fr 1.2fr 1fr;
+
+            align-items: center;
+
+            padding: 17px 22px;
+
+            border-bottom: 1px solid #eeeef3;
+
+            font-size: 13px;
+        }
+
+        .section-row:last-child {
+            border-bottom: none;
+        }
+
+        .section-name {
+            font-weight: bold;
+        }
+
+        .program {
+            color: #59657d;
+        }
+
+        .capacity {
+            color: #71809b;
+        }
+
+        /* ================= PROGRESS ================= */
+
+        .progress-container {
+            width: 130px;
+        }
+
+        .progress {
+            height: 7px;
+            background: #eeeaf5;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: #7845e8;
+            border-radius: 10px;
+        }
+
+        .filled {
+            font-size: 11px;
+            color: #71809b;
+            margin-top: 5px;
+        }
+
+        /* ================= STATUS ================= */
+
+        .status {
+            color: #15966a;
+            font-size: 11px;
+            font-weight: bold;
+        }
+
+        .almost-full {
+            color: #d98b00;
+        }
+
+        /* ================= RESPONSIVE ================= */
+
+        @media (max-width: 1000px) {
+
+            .sidebar {
+                width: 210px;
+            }
+
+            .main {
+                margin-left: 210px;
+            }
+
+            .section-row {
+                grid-template-columns: 1fr 1fr 1fr;
+                gap: 12px;
+            }
+        }
+
+        @media (max-width: 700px) {
+
+            .sidebar {
+                position: relative;
+                width: 100%;
+                height: auto;
+            }
+
+            .main {
+                margin-left: 0;
+            }
+
+            .logout {
+                position: static;
+                margin-top: 15px;
+            }
+
+            .content {
+                padding: 20px;
+            }
+
+            .section-row {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .topbar {
+                justify-content: center;
+            }
+        }
+
+        @media (max-width: 500px) {
+
+            .section-row {
+                grid-template-columns: 1fr;
+            }
+
+            .live-box {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<!-- =====================================================
+     SIDEBAR
+===================================================== -->
+
+<div class="sidebar">
+
+    <div class="logo">
+        <h1>SectionSync</h1>
+        <p>Student Portal</p>
+    </div>
+
+    <ul class="menu">
+
+        <!-- Dashboard -->
+        <li class="menu-item">
+            <a href="/student/dashboard" class="menu-link">
+                <span class="icon">⌂</span>
+                <span>Dashboard</span>
+            </a>
+        </li>
+
+        <!-- Profile -->
+        <li class="menu-item">
+            <a href="/student/profile" class="menu-link">
+                <span class="icon">●</span>
+                <span>My Profile</span>
+            </a>
+        </li>
+
+        <!-- Fee Verification -->
+        <li class="menu-item">
+            <a href="/student/fee-verification" class="menu-link">
+                <span class="icon">▣</span>
+                <span>Fee Verification</span>
+            </a>
+        </li>
+
+        <!-- Section Preferences -->
+        <li class="menu-item">
+
+            <div class="menu-link">
+
+                <div class="section-header">
+
+                    <span class="icon">▣</span>
+
+                    <span>Section Preferences</span>
+
+                    <span class="arrow">⌃</span>
+
+                </div>
+
+            </div>
+
+            <div class="submenu">
+
+                <a href="/student/live-basket-filling" 
+                    class="active-sub">
+
+                    Live Basket Filling
+
+                </a>
+
+                <a href="/student/section-preferences">
+                    Preferred Sections
+
+                </a>
+
+            </div>
+
+        </li>
+
+        <!-- Allocation Status -->
+        <li class="menu-item">
+
+            <a href="/student/allocation-status"
+               class="menu-link">
+
+                <span class="icon">◔</span>
+
+                <span>Allocation Status</span>
+
+            </a>
+
+        </li>
+
+    </ul>
+
+
+    <!-- Logout -->
+
+    <div class="logout">
+
+        <a href="/logout"
+           class="menu-link">
+
+            <span class="icon">↪</span>
+
+            <span>Logout</span>
+
+        </a>
+
+    </div>
+
+</div>
+
+
+<!-- =====================================================
+     MAIN
+===================================================== -->
+
+<div class="main">
+
+
+    <!-- TOP BAR -->
+
+    <div class="topbar">
+
+        <div class="profile-area">
+
+            <div class="notification"></div>
+
+            <div class="avatar">
+                👤
+            </div>
+
+            <div>
+
+                <div class="user-name">
+                    {{ student['student_name'] }}
+                </div>
+
+                <div class="user-id">
+                    {{ student['enrollment_no'] }}
+                </div>
+
+            </div>
+
+            <span>▼</span>
+
+        </div>
+
+    </div>
+
+
+    <!-- =================================================
+         CONTENT
+    ================================================= -->
+
+    <div class="content">
+
+
+        <!-- PAGE TITLE -->
+
+        <div class="page-title">
+
+            <h1>Live Basket Filling</h1>
+
+            <p>
+                View the current seat availability of all sections.
+            </p>
+
+        </div>
+
+
+        <!-- LIVE STATUS -->
+
+        <div class="live-box">
+
+            <div class="live-left">
+
+                <div class="live-icon">
+                    ◉
+                </div>
+
+                <div>
+
+                    <div class="live-title">
+                        Live Section Availability
+                    </div>
+
+                    <div class="live-text">
+                        Seat availability is updated as students fill
+                        their section preferences.
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="live-status">
+                ● LIVE
+            </div>
+
+        </div>
+
+
+        <!-- =================================================
+             ALL SECTIONS A-O
+        ================================================= -->
+
+        <div class="panel">
+
+
+            <div class="panel-header">
+
+                <h3>
+                    Current Section Capacity
+                </h3>
+
+                <p>
+                    All sections are visible. Availability is shown
+                    for information before preference submission.
+                </p>
+
+            </div>
+
+
+            <!-- TABLE HEADER -->
+
+            <div class="section-row">
+
+                <strong>Section</strong>
+
+                <strong>Program</strong>
+
+                <strong>Capacity</strong>
+
+                <strong>Filled</strong>
+
+                <strong>Status</strong>
+
+            </div>
+
+
+            {% for section in sections %}
+            <div class="section-row">
+                <div class="section-name">{{ section['section_name'] }}</div>
+                <div class="program">{{ section['program'] }}</div>
+                <div class="capacity">{{ section['capacity'] }} seats</div>
+                <div class="progress-container">
+                    <div class="progress">
+                        <div class="progress-bar" style="width:{{ section['percent'] }}%;"></div>
+                    </div>
+                    <div class="filled">{{ section['filled'] }} / {{ section['capacity'] }} filled</div>
+                </div>
+                <div class="status {% if section['status'] == 'Almost Full' or section['status'] == 'Full' %}almost-full{% endif %}">
+                    {{ section['status'] }}
+                </div>
+            </div>
+            {% else %}
+            <div class="section-row">
+                <div class="empty">No section capacities have been configured yet.</div>
+            </div>
+            {% endfor %}
+
+        </div>
+
+    </div>
+
+</div>
+
+</body>
+</html>
+"""
