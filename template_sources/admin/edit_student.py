@@ -1,3 +1,118 @@
 """Python source for the admin/edit_student.html page template."""
 
-TEMPLATE_SOURCE = '```html\n<!DOCTYPE html>\n<html lang="en">\n<head>\n    <meta charset="UTF-8">\n    <meta name="viewport" content="width=device-width, initial-scale=1.0">\n    <title>Edit Student - SectionSync</title>\n\n    <style>\n        body {\n            font-family: Arial, sans-serif;\n            background: #f4f6fa;\n            margin: 0;\n            padding: 30px;\n        }\n\n        .edit-container {\n            max-width: 600px;\n            margin: 30px auto;\n            padding: 25px;\n            background: white;\n            border-radius: 12px;\n            box-shadow: 0 4px 18px rgba(0, 0, 0, 0.08);\n        }\n\n        h2 {\n            margin-top: 0;\n            color: #172554;\n        }\n\n        label {\n            display: block;\n            margin-top: 15px;\n            font-weight: bold;\n        }\n\n        input {\n            width: 100%;\n            box-sizing: border-box;\n            padding: 10px;\n            margin-top: 6px;\n            border: 1px solid #d1d5db;\n            border-radius: 6px;\n        }\n\n        .save-button {\n            margin-top: 22px;\n            padding: 11px 18px;\n            background: #172554;\n            color: white;\n            border: none;\n            border-radius: 6px;\n            cursor: pointer;\n        }\n\n        .back-link {\n            margin-left: 12px;\n            color: #172554;\n        }\n\n        .error {\n            color: #b91c1c;\n        }\n    </style>\n</head>\n\n<body>\n    <div class="edit-container">\n        <h2>Edit Student</h2>\n\n        {% if error %}\n            <p class="error">{{ error }}</p>\n        {% endif %}\n\n        <form method="POST">\n            <label>Student Name</label>\n            <input type="text" name="student_name"\n                   value="{{ student[\'student_name\'] }}" required>\n\n            <label>Enrollment Number</label>\n            <input type="text" name="enrollment_no"\n                   value="{{ student[\'enrollment_no\'] }}" required>\n\n            <label>Program</label>\n            <input type="text" name="program"\n                   value="{{ student[\'program\'] }}" required>\n\n            <label>CGPA (0–10)</label>\n            <input type="number" name="cgpa" min="0" max="10" step="0.01"\n                   value="{{ student[\'cgpa\'] if student[\'cgpa\'] is not none else \'\' }}">\n\n            <label>Date of Birth</label>\n            <input type="text" name="dob"\n                   value="{{ student[\'dob\'] or \'\' }}">\n\n            <label>Email</label>\n            <input type="email" name="email"\n                   value="{{ student[\'email\'] or \'\' }}">\n\n            <label>Batch</label>\n            <input type="text" name="batch"\n                   value="{{ student[\'batch\'] or \'\' }}">\n\n            <label>New Password (leave blank to keep the current password)</label>\n            <input type="password" name="password"\n                   placeholder="Enter only if changing the password">\n\n            <button type="submit" class="save-button">Save Changes</button>\n            <a href="{{ url_for(\'student_management\') }}"\n               class="back-link">Cancel</a>\n        </form>\n    </div>\n</body>\n</html>\n```\n'
+TEMPLATE_SOURCE = r"""```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Student - SectionSync</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f6fa;
+            margin: 0;
+            padding: 30px;
+        }
+
+        .edit-container {
+            max-width: 600px;
+            margin: 30px auto;
+            padding: 25px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 18px rgba(0, 0, 0, 0.08);
+        }
+
+        h2 {
+            margin-top: 0;
+            color: #172554;
+        }
+
+        label {
+            display: block;
+            margin-top: 15px;
+            font-weight: bold;
+        }
+
+        input {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 10px;
+            margin-top: 6px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+        }
+
+        .save-button {
+            margin-top: 22px;
+            padding: 11px 18px;
+            background: #172554;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .back-link {
+            margin-left: 12px;
+            color: #172554;
+        }
+
+        .error {
+            color: #b91c1c;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="edit-container">
+        <h2>Edit Student</h2>
+
+        {% if error %}
+            <p class="error">{{ error }}</p>
+        {% endif %}
+
+        <form method="POST">
+            <label>Student Name</label>
+            <input type="text" name="student_name"
+                   value="{{ student['student_name'] }}" required>
+
+            <label>Enrollment Number</label>
+            <input type="text" name="enrollment_no"
+                   value="{{ student['enrollment_no'] }}" required>
+
+            <label>Program</label>
+            <input type="text" name="program"
+                   value="{{ student['program'] }}" required>
+
+            <label>CGPA (0–10)</label>
+            <input type="number" name="cgpa" min="0" max="10" step="0.01"
+                   value="{{ student['cgpa'] if student['cgpa'] is not none else '' }}">
+
+            <label>Date of Birth</label>
+            <input type="text" name="dob"
+                   value="{{ student['dob'] or '' }}">
+
+            <label>Email</label>
+            <input type="email" name="email"
+                   value="{{ student['email'] or '' }}">
+
+            <label>Batch</label>
+            <input type="text" name="batch"
+                   value="{{ student['batch'] or '' }}">
+
+            <label>New Password (leave blank to keep the current password)</label>
+            <input type="password" name="password"
+                   placeholder="Enter only if changing the password">
+
+            <button type="submit" class="save-button">Save Changes</button>
+            <a href="{{ url_for('student_management') }}"
+               class="back-link">Cancel</a>
+        </form>
+    </div>
+</body>
+</html>
+```
+"""
