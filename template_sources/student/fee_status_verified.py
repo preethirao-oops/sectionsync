@@ -1,3 +1,294 @@
 """Python source for the student/fee_status_verified.html page template."""
 
-TEMPLATE_SOURCE = '<!DOCTYPE html>\n<html lang="en">\n<head>\n    <meta charset="UTF-8">\n    <meta name="viewport" content="width=device-width, initial-scale=1.0">\n\n    <title>Fee Status Verified - SectionSync</title>\n\n    <style>\n        * {\n            margin: 0;\n            padding: 0;\n            box-sizing: border-box;\n            font-family: Arial, sans-serif;\n        }\n\n        body {\n            background: #f7f7fb;\n            color: #25233d;\n        }\n\n        .sidebar {\n            position: fixed;\n            left: 0;\n            top: 0;\n            width: 250px;\n            height: 100vh;\n            background: #25233d;\n            color: white;\n            padding: 25px 15px;\n        }\n\n        .logo {\n            padding: 10px 15px 30px;\n        }\n\n        .logo h1 {\n            font-size: 25px;\n        }\n\n        .logo p {\n            font-size: 13px;\n            color: #b9b6c9;\n            margin-top: 5px;\n        }\n\n        .menu {\n            list-style: none;\n        }\n\n        .menu-item {\n            margin-bottom: 8px;\n        }\n\n        .menu-link {\n            display: flex;\n            align-items: center;\n            gap: 12px;\n            padding: 13px 15px;\n            color: #ddd;\n            text-decoration: none;\n            border-radius: 8px;\n        }\n\n        .menu-link:hover {\n            background: rgba(216, 197, 255, 0.12);\n        }\n\n        .icon {\n            width: 20px;\n            text-align: center;\n        }\n\n        .logout {\n            position: absolute;\n            bottom: 25px;\n            left: 15px;\n            right: 15px;\n        }\n\n        .main {\n            margin-left: 250px;\n            min-height: 100vh;\n            padding: 40px;\n        }\n\n        .topbar h2 {\n            font-size: 28px;\n            margin-bottom: 8px;\n        }\n\n        .topbar p {\n            color: #777;\n            margin-bottom: 30px;\n        }\n\n        .card {\n            background: white;\n            border: 1px solid #e7e5ef;\n            border-radius: 14px;\n            padding: 35px;\n            max-width: 700px;\n            box-shadow: 0 5px 20px rgba(37, 35, 61, 0.05);\n        }\n\n        .success-icon {\n            width: 65px;\n            height: 65px;\n            border-radius: 50%;\n            background: #e9ddff;\n            color: #713ce6;\n            display: flex;\n            align-items: center;\n            justify-content: center;\n            font-size: 32px;\n            margin-bottom: 20px;\n        }\n\n        .card h3 {\n            font-size: 24px;\n            margin-bottom: 10px;\n        }\n\n        .success-text {\n            color: #666;\n            margin-bottom: 28px;\n        }\n\n        .details {\n            background: #f7f7fb;\n            border-radius: 10px;\n            padding: 20px;\n        }\n\n        .detail-row {\n            display: flex;\n            justify-content: space-between;\n            padding: 12px 0;\n            border-bottom: 1px solid #e5e3eb;\n        }\n\n        .detail-row:last-child {\n            border-bottom: none;\n        }\n\n        .label {\n            color: #777;\n        }\n\n        .value {\n            font-weight: 600;\n        }\n\n        .verified {\n            color: #238636;\n            font-weight: 700;\n        }\n\n        .back-btn {\n            display: inline-block;\n            margin-top: 25px;\n            padding: 12px 22px;\n            background: #7845e8;\n            color: white;\n            text-decoration: none;\n            border-radius: 8px;\n        }\n\n        .back-btn:hover {\n            background: #713ce6;\n        }\n    </style>\n</head>\n\n<body>\n\n    <div class="sidebar">\n\n        <div class="logo">\n            <h1>SectionSync</h1>\n            <p>Student Portal</p>\n        </div>\n\n        <ul class="menu">\n\n            <li class="menu-item">\n                <a href="/student/dashboard" class="menu-link">\n                    <span class="icon">⌂</span>\n                    <span>Dashboard</span>\n                </a>\n            </li>\n\n            <li class="menu-item">\n                <a href="/student/profile" class="menu-link">\n                    <span class="icon">●</span>\n                    <span>My Profile</span>\n                </a>\n            </li>\n\n            <li class="menu-item">\n                <a href="/student/fee-verification" class="menu-link">\n                    <span class="icon">▣</span>\n                    <span>Fee Verification</span>\n                </a>\n            </li>\n\n            <li class="menu-item">\n                <a href="/student/live-basket-filling" class="menu-link">\n                    <span class="icon">▣</span>\n                    <span>Live Basket Filling</span>\n                </a>\n            </li>\n\n            <li class="menu-item">\n                <a href="/student/section-preferences" class="menu-link">\n                    <span class="icon">▣</span>\n                    <span>Preferred Sections</span>\n                </a>\n            </li>\n\n            <li class="menu-item">\n                <a href="/student/allocation-status" class="menu-link">\n                    <span class="icon">◔</span>\n                    <span>Allocation Status</span>\n                </a>\n            </li>\n\n        </ul>\n\n        <div class="logout">\n            <a href="/logout" class="menu-link">\n                <span class="icon">↪</span>\n                <span>Logout</span>\n            </a>\n        </div>\n\n    </div>\n\n\n    <div class="main">\n\n        <div class="topbar">\n            <h2>Fee Verification</h2>\n            <p>Student fee payment verification</p>\n        </div>\n\n        <div class="card">\n\n            <div class="success-icon">\n                ✓\n            </div>\n\n            <h3>Fee Status Verified</h3>\n\n            <p class="success-text">\n                Your fee payment has been successfully verified.\n            </p>\n\n            <div class="details">\n\n                <div class="detail-row">\n                    <span class="label">Student Name</span>\n                    <span class="value">{{ student_name }}</span>\n                </div>\n\n                <div class="detail-row">\n                    <span class="label">Enrollment Number</span>\n                    <span class="value">{{ enrollment_no }}</span>\n                </div>\n\n                <div class="detail-row">\n                    <span class="label">Order ID</span>\n                    <span class="value">{{ order_id }}</span>\n                </div>\n\n                <div class="detail-row">\n                    <span class="label">Payment Status</span>\n                    <span class="verified">Verified</span>\n                </div>\n\n            </div>\n\n            <a href="/student/dashboard" class="back-btn">\n                Back to Dashboard\n            </a>\n\n        </div>\n\n    </div>\n\n</body>\n</html>'
+TEMPLATE_SOURCE = r"""<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Fee Status Verified - SectionSync</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background: #f7f7fb;
+            color: #25233d;
+        }
+
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 250px;
+            height: 100vh;
+            background: #25233d;
+            color: white;
+            padding: 25px 15px;
+        }
+
+        .logo {
+            padding: 10px 15px 30px;
+        }
+
+        .logo h1 {
+            font-size: 25px;
+        }
+
+        .logo p {
+            font-size: 13px;
+            color: #b9b6c9;
+            margin-top: 5px;
+        }
+
+        .menu {
+            list-style: none;
+        }
+
+        .menu-item {
+            margin-bottom: 8px;
+        }
+
+        .menu-link {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 13px 15px;
+            color: #ddd;
+            text-decoration: none;
+            border-radius: 8px;
+        }
+
+        .menu-link:hover {
+            background: rgba(216, 197, 255, 0.12);
+        }
+
+        .icon {
+            width: 20px;
+            text-align: center;
+        }
+
+        .logout {
+            position: absolute;
+            bottom: 25px;
+            left: 15px;
+            right: 15px;
+        }
+
+        .main {
+            margin-left: 250px;
+            min-height: 100vh;
+            padding: 40px;
+        }
+
+        .topbar h2 {
+            font-size: 28px;
+            margin-bottom: 8px;
+        }
+
+        .topbar p {
+            color: #777;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background: white;
+            border: 1px solid #e7e5ef;
+            border-radius: 14px;
+            padding: 35px;
+            max-width: 700px;
+            box-shadow: 0 5px 20px rgba(37, 35, 61, 0.05);
+        }
+
+        .success-icon {
+            width: 65px;
+            height: 65px;
+            border-radius: 50%;
+            background: #e9ddff;
+            color: #713ce6;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            margin-bottom: 20px;
+        }
+
+        .card h3 {
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+
+        .success-text {
+            color: #666;
+            margin-bottom: 28px;
+        }
+
+        .details {
+            background: #f7f7fb;
+            border-radius: 10px;
+            padding: 20px;
+        }
+
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid #e5e3eb;
+        }
+
+        .detail-row:last-child {
+            border-bottom: none;
+        }
+
+        .label {
+            color: #777;
+        }
+
+        .value {
+            font-weight: 600;
+        }
+
+        .verified {
+            color: #238636;
+            font-weight: 700;
+        }
+
+        .back-btn {
+            display: inline-block;
+            margin-top: 25px;
+            padding: 12px 22px;
+            background: #7845e8;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+        }
+
+        .back-btn:hover {
+            background: #713ce6;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="sidebar">
+
+        <div class="logo">
+            <h1>SectionSync</h1>
+            <p>Student Portal</p>
+        </div>
+
+        <ul class="menu">
+
+            <li class="menu-item">
+                <a href="/student/dashboard" class="menu-link">
+                    <span class="icon">⌂</span>
+                    <span>Dashboard</span>
+                </a>
+            </li>
+
+            <li class="menu-item">
+                <a href="/student/profile" class="menu-link">
+                    <span class="icon">●</span>
+                    <span>My Profile</span>
+                </a>
+            </li>
+
+            <li class="menu-item">
+                <a href="/student/fee-verification" class="menu-link">
+                    <span class="icon">▣</span>
+                    <span>Fee Verification</span>
+                </a>
+            </li>
+
+            <li class="menu-item">
+                <a href="/student/live-basket-filling" class="menu-link">
+                    <span class="icon">▣</span>
+                    <span>Live Basket Filling</span>
+                </a>
+            </li>
+
+            <li class="menu-item">
+                <a href="/student/section-preferences" class="menu-link">
+                    <span class="icon">▣</span>
+                    <span>Preferred Sections</span>
+                </a>
+            </li>
+
+            <li class="menu-item">
+                <a href="/student/allocation-status" class="menu-link">
+                    <span class="icon">◔</span>
+                    <span>Allocation Status</span>
+                </a>
+            </li>
+
+        </ul>
+
+        <div class="logout">
+            <a href="/logout" class="menu-link">
+                <span class="icon">↪</span>
+                <span>Logout</span>
+            </a>
+        </div>
+
+    </div>
+
+
+    <div class="main">
+
+        <div class="topbar">
+            <h2>Fee Verification</h2>
+            <p>Student fee payment verification</p>
+        </div>
+
+        <div class="card">
+
+            <div class="success-icon">
+                ✓
+            </div>
+
+            <h3>Fee Status Verified</h3>
+
+            <p class="success-text">
+                Your fee payment has been successfully verified.
+            </p>
+
+            <div class="details">
+
+                <div class="detail-row">
+                    <span class="label">Student Name</span>
+                    <span class="value">{{ student_name }}</span>
+                </div>
+
+                <div class="detail-row">
+                    <span class="label">Enrollment Number</span>
+                    <span class="value">{{ enrollment_no }}</span>
+                </div>
+
+                <div class="detail-row">
+                    <span class="label">Order ID</span>
+                    <span class="value">{{ order_id }}</span>
+                </div>
+
+                <div class="detail-row">
+                    <span class="label">Payment Status</span>
+                    <span class="verified">Verified</span>
+                </div>
+
+            </div>
+
+            <a href="/student/dashboard" class="back-btn">
+                Back to Dashboard
+            </a>
+
+        </div>
+
+    </div>
+
+</body>
+</html>"""
