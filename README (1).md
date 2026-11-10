@@ -183,17 +183,6 @@ Set the variables from [Configuration](#configuration). For more details, see [D
 > [!WARNING]
 > This project currently uses temporary demo authentication and does **not** store passwords as hashes. Treat public deployments as private previews until authentication is made production-ready.
 
-The app seeds a demo administrator account for local preview:
-
-| Username  | Password   |
-| --------- | ---------- |
-| `admin01` | `admin123` |
-
-Before exposing an instance publicly:
-
-- Change or remove the demo credentials.
-- Set a strong `SECTION_SYNC_SECRET_KEY`.
-- Do not use real student or payment data in a public demo.
 
 ## Contributing
 
@@ -205,12 +194,3 @@ Contributions, issues, and feature requests are welcome.
 4. Push to the branch (`git push origin feature/your-feature`)
 5. Open a Pull Request
 
-You can also browse [open issues](https://github.com/preethirao-oops/sectionsync/issues).
-
----
-
-<div align="center">
-
-Built with Flask · [Live Demo](https://sectionsync-z5dw.onrender.com) · [GitHub](https://github.com/preethirao-oops/sectionsync)
-
-</div>
