@@ -1,3 +1,493 @@
 """Python source for the login.html page template."""
 
-TEMPLATE_SOURCE = '<!DOCTYPE html>\n<html lang="en">\n<head>\n    <meta charset="UTF-8">\n    <meta name="viewport" content="width=device-width, initial-scale=1.0">\n\n    <title>SectionSync | Login</title>\n\n    <style>\n        * {\n            margin: 0;\n            padding: 0;\n            box-sizing: border-box;\n        }\n\n        body {\n            font-family: "Segoe UI", Arial, sans-serif;\n            min-height: 100vh;\n            background: #f4f6f8;\n            display: flex;\n            align-items: center;\n            justify-content: center;\n            color: #172033;\n        }\n\n        .login-wrapper {\n            width: 900px;\n            max-width: 94%;\n            min-height: 540px;\n            display: flex;\n            background: white;\n            border-radius: 18px;\n            overflow: hidden;\n            box-shadow: 0 15px 45px rgba(23, 32, 51, 0.12);\n        }\n\n        /* LEFT SIDE */\n\n        .login-left {\n            width: 48%;\n            background: #172f4f;\n            color: white;\n            padding: 55px 45px;\n            display: flex;\n            flex-direction: column;\n            justify-content: center;\n        }\n\n        .brand {\n            display: flex;\n            align-items: center;\n            gap: 12px;\n            margin-bottom: 55px;\n        }\n\n        .brand-icon {\n            width: 45px;\n            height: 45px;\n            border-radius: 12px;\n            background: #d8a85b;\n            display: flex;\n            align-items: center;\n            justify-content: center;\n            font-size: 23px;\n        }\n\n        .brand h1 {\n            font-size: 25px;\n            letter-spacing: 0.3px;\n        }\n\n        .brand p {\n            font-size: 12px;\n            opacity: 0.75;\n            margin-top: 2px;\n        }\n\n        .login-left h2 {\n            font-size: 36px;\n            line-height: 1.2;\n            margin-bottom: 15px;\n        }\n\n        .login-left > p {\n            font-size: 15px;\n            line-height: 1.7;\n            color: #d6deea;\n            max-width: 330px;\n        }\n\n        .feature {\n            display: flex;\n            align-items: center;\n            gap: 12px;\n            margin-top: 32px;\n            font-size: 14px;\n            color: #e7edf5;\n        }\n\n        .feature span {\n            width: 30px;\n            height: 30px;\n            border-radius: 50%;\n            background: rgba(216, 168, 91, 0.18);\n            display: flex;\n            align-items: center;\n            justify-content: center;\n            color: #d8a85b;\n        }\n\n        /* RIGHT SIDE */\n\n        .login-right {\n            width: 52%;\n            padding: 55px 55px;\n            display: flex;\n            flex-direction: column;\n            justify-content: center;\n        }\n\n        .login-heading {\n            margin-bottom: 30px;\n        }\n\n        .login-heading h2 {\n            font-size: 28px;\n            margin-bottom: 8px;\n        }\n\n        .login-heading p {\n            color: #718096;\n            font-size: 14px;\n        }\n\n        .form-group {\n            margin-bottom: 21px;\n        }\n\n        .form-group label {\n            display: block;\n            font-size: 14px;\n            font-weight: 600;\n            margin-bottom: 8px;\n        }\n\n        .form-group input {\n            width: 100%;\n            height: 48px;\n            border: 1px solid #d9e0e8;\n            border-radius: 9px;\n            padding: 0 15px;\n            font-size: 14px;\n            outline: none;\n            transition: 0.2s;\n        }\n\n        .form-group input:focus {\n            border-color: #315f91;\n            box-shadow: 0 0 0 3px rgba(49, 95, 145, 0.10);\n        }\n\n        .hint {\n            font-size: 11px;\n            color: #7a8492;\n            margin-top: 7px;\n        }\n\n        .password-box {\n            position: relative;\n        }\n\n        .password-box input {\n            padding-right: 70px;\n        }\n\n        .show-password {\n            position: absolute;\n            right: 13px;\n            top: 50%;\n            transform: translateY(-50%);\n            border: none;\n            background: transparent;\n            color: #315f91;\n            font-size: 12px;\n            cursor: pointer;\n            font-weight: 600;\n        }\n\n        .login-options {\n            display: flex;\n            justify-content: space-between;\n            align-items: center;\n            margin-bottom: 25px;\n            font-size: 13px;\n        }\n\n        .remember {\n            display: flex;\n            align-items: center;\n            gap: 7px;\n            color: #596579;\n        }\n\n        .login-button {\n            width: 100%;\n            height: 49px;\n            border: none;\n            border-radius: 9px;\n            background: #315f91;\n            color: white;\n            font-size: 15px;\n            font-weight: 600;\n            cursor: pointer;\n            transition: 0.2s;\n        }\n\n        .login-button:hover {\n            background: #264d78;\n        }\n\n        .error-message {\n            display: none;\n            background: #fff1f1;\n            color: #c0392b;\n            border: 1px solid #f0cccc;\n            border-radius: 8px;\n            padding: 10px 12px;\n            margin-bottom: 18px;\n            font-size: 13px;\n        }\n\n        .footer-text {\n            text-align: center;\n            margin-top: 25px;\n            font-size: 12px;\n            color: #8993a1;\n        }\n\n        /* RESPONSIVE */\n\n        @media (max-width: 750px) {\n\n            .login-wrapper {\n                flex-direction: column;\n                width: 94%;\n            }\n\n            .login-left,\n            .login-right {\n                width: 100%;\n            }\n\n            .login-left {\n                padding: 35px;\n            }\n\n            .brand {\n                margin-bottom: 30px;\n            }\n\n            .login-left h2 {\n                font-size: 28px;\n            }\n\n            .feature {\n                display: none;\n            }\n\n            .login-right {\n                padding: 40px 30px;\n            }\n        }\n    </style>\n</head>\n\n<body>\n\n<div class="login-wrapper">\n\n    <!-- LEFT SECTION -->\n\n    <div class="login-left">\n\n        <div class="brand">\n            <div class="brand-icon">▦</div>\n\n            <div>\n                <h1>SectionSync</h1>\n                <p>Multi-Section Management System</p>\n            </div>\n        </div>\n\n        <h2>Welcome back.</h2>\n\n        \n\n        \n\n    </div>\n\n\n    <!-- RIGHT SECTION -->\n\n    <div class="login-right">\n\n        <div class="login-heading">\n            <h2>Student Login</h2>\n            <p>Enter your enrollment number and password.</p>\n        </div>\n\n        <div id="errorMessage" class="error-message">\n            Please enter a valid enrollment number.\n        </div>\n\n        <form action="/login" method="POST">\n\n            <div class="form-group">\n\n                <label for="enrollment">\n                    Enrollment Number\n                </label>\n\n                <input\n                    type="text"\n                    id="enrollment"\n                    name="enrollment"\n                    placeholder="Example: 24STUCHH010618"\n                    maxlength="14"\n                    autocomplete="off"\n                    required\n                >\n\n                <div class="hint">\n                    Format: YYSTUCHHXXXXXX\n                </div>\n\n            </div>\n\n\n            <div class="form-group">\n\n                <label for="password">\n                    Password\n                </label>\n\n                <div class="password-box">\n\n                    <input\n                        type="password"\n                        id="password"\n                        name="password"\n                        placeholder="Enter your password"\n                        required\n                    >\n\n                    <button\n                        type="button"\n                        class="show-password"\n                        onclick="togglePassword()"\n                    >\n                        Show\n                    </button>\n\n                </div>\n\n            </div>\n\n\n            <div class="login-options">\n\n                <label class="remember">\n                    <input type="checkbox">\n                    Remember me\n                </label>\n\n            </div>\n\n\n            <button\n                type="submit"\n                class="login-button"\n            >\n                Login\n            </button>\n\n        </form>\n\n\n        <div class="footer-text">\n            © 2026 SectionSync · Student Portal\n        </div>\n\n    </div>\n\n</div>\n\n\n<script>\n\n    function togglePassword() {\n\n        const password = document.getElementById("password");\n        const button = document.querySelector(".show-password");\n\n        if (password.type === "password") {\n\n            password.type = "text";\n            button.textContent = "Hide";\n\n        } else {\n\n            password.type = "password";\n            button.textContent = "Show";\n\n        }\n    }\n\n\n    function loginUser(event) {\n\n        event.preventDefault();\n\n        const enrollment =\n            document.getElementById("enrollment").value\n            .trim()\n            .toUpperCase();\n\n        const password =\n            document.getElementById("password").value;\n\n        const error =\n            document.getElementById("errorMessage");\n\n\n        /*\n         * Enrollment format:\n         *\n         * 24STUCHH010618\n         * 23STUCHH010618\n         * 25STUCHH010618\n         *\n         * First two digits = joining year\n         */\n\n        const enrollmentPattern =\n            /^(20|21|22|23|24|25|26|27|28|29)STUCHH\\d{6}$/;\n\n\n        if (!enrollmentPattern.test(enrollment)) {\n\n            error.textContent =\n                "Invalid enrollment number. Example: 24STUCHH010618";\n\n            error.style.display = "block";\n\n            return;\n        }\n\n\n        if (password.length === 0) {\n\n            error.textContent =\n                "Please enter your password.";\n\n            error.style.display = "block";\n\n            return;\n        }\n\n\n        /*\n         * TEMPORARY FRONTEND LOGIN\n         *\n         * Database authentication will be\n         * connected later through Flask.\n         */\n\n        sessionStorage.setItem(\n            "studentEnrollment",\n            enrollment\n        );\n\n\n        window.location.href =\n            "/student/dashboard.html";\n    }\n\n</script>\n\n</body>\n</html>'
+TEMPLATE_SOURCE = r"""<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>SectionSync | Login</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: "Segoe UI", Arial, sans-serif;
+            min-height: 100vh;
+            background: #f4f6f8;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #172033;
+        }
+
+        .login-wrapper {
+            width: 900px;
+            max-width: 94%;
+            min-height: 540px;
+            display: flex;
+            background: white;
+            border-radius: 18px;
+            overflow: hidden;
+            box-shadow: 0 15px 45px rgba(23, 32, 51, 0.12);
+        }
+
+        /* LEFT SIDE */
+
+        .login-left {
+            width: 48%;
+            background: #172f4f;
+            color: white;
+            padding: 55px 45px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 55px;
+        }
+
+        .brand-icon {
+            width: 45px;
+            height: 45px;
+            border-radius: 12px;
+            background: #d8a85b;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 23px;
+        }
+
+        .brand h1 {
+            font-size: 25px;
+            letter-spacing: 0.3px;
+        }
+
+        .brand p {
+            font-size: 12px;
+            opacity: 0.75;
+            margin-top: 2px;
+        }
+
+        .login-left h2 {
+            font-size: 36px;
+            line-height: 1.2;
+            margin-bottom: 15px;
+        }
+
+        .login-left > p {
+            font-size: 15px;
+            line-height: 1.7;
+            color: #d6deea;
+            max-width: 330px;
+        }
+
+        .feature {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-top: 32px;
+            font-size: 14px;
+            color: #e7edf5;
+        }
+
+        .feature span {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: rgba(216, 168, 91, 0.18);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #d8a85b;
+        }
+
+        /* RIGHT SIDE */
+
+        .login-right {
+            width: 52%;
+            padding: 55px 55px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .login-heading {
+            margin-bottom: 30px;
+        }
+
+        .login-heading h2 {
+            font-size: 28px;
+            margin-bottom: 8px;
+        }
+
+        .login-heading p {
+            color: #718096;
+            font-size: 14px;
+        }
+
+        .form-group {
+            margin-bottom: 21px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .form-group input {
+            width: 100%;
+            height: 48px;
+            border: 1px solid #d9e0e8;
+            border-radius: 9px;
+            padding: 0 15px;
+            font-size: 14px;
+            outline: none;
+            transition: 0.2s;
+        }
+
+        .form-group input:focus {
+            border-color: #315f91;
+            box-shadow: 0 0 0 3px rgba(49, 95, 145, 0.10);
+        }
+
+        .hint {
+            font-size: 11px;
+            color: #7a8492;
+            margin-top: 7px;
+        }
+
+        .password-box {
+            position: relative;
+        }
+
+        .password-box input {
+            padding-right: 70px;
+        }
+
+        .show-password {
+            position: absolute;
+            right: 13px;
+            top: 50%;
+            transform: translateY(-50%);
+            border: none;
+            background: transparent;
+            color: #315f91;
+            font-size: 12px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .login-options {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            font-size: 13px;
+        }
+
+        .remember {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            color: #596579;
+        }
+
+        .login-button {
+            width: 100%;
+            height: 49px;
+            border: none;
+            border-radius: 9px;
+            background: #315f91;
+            color: white;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .login-button:hover {
+            background: #264d78;
+        }
+
+        .error-message {
+            display: none;
+            background: #fff1f1;
+            color: #c0392b;
+            border: 1px solid #f0cccc;
+            border-radius: 8px;
+            padding: 10px 12px;
+            margin-bottom: 18px;
+            font-size: 13px;
+        }
+
+        .footer-text {
+            text-align: center;
+            margin-top: 25px;
+            font-size: 12px;
+            color: #8993a1;
+        }
+
+        /* RESPONSIVE */
+
+        @media (max-width: 750px) {
+
+            .login-wrapper {
+                flex-direction: column;
+                width: 94%;
+            }
+
+            .login-left,
+            .login-right {
+                width: 100%;
+            }
+
+            .login-left {
+                padding: 35px;
+            }
+
+            .brand {
+                margin-bottom: 30px;
+            }
+
+            .login-left h2 {
+                font-size: 28px;
+            }
+
+            .feature {
+                display: none;
+            }
+
+            .login-right {
+                padding: 40px 30px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="login-wrapper">
+
+    <!-- LEFT SECTION -->
+
+    <div class="login-left">
+
+        <div class="brand">
+            <div class="brand-icon">▦</div>
+
+            <div>
+                <h1>SectionSync</h1>
+                <p>Multi-Section Management System</p>
+            </div>
+        </div>
+
+        <h2>Welcome back.</h2>
+
+        
+
+        
+
+    </div>
+
+
+    <!-- RIGHT SECTION -->
+
+    <div class="login-right">
+
+        <div class="login-heading">
+            <h2>Student Login</h2>
+            <p>Enter your enrollment number and password.</p>
+        </div>
+
+        <div id="errorMessage" class="error-message">
+            Please enter a valid enrollment number.
+        </div>
+
+        <form action="/login" method="POST">
+
+            <div class="form-group">
+
+                <label for="enrollment">
+                    Enrollment Number
+                </label>
+
+                <input
+                    type="text"
+                    id="enrollment"
+                    name="enrollment"
+                    placeholder="Example: 24STUCHH010618"
+                    maxlength="14"
+                    autocomplete="off"
+                    required
+                >
+
+                <div class="hint">
+                    Format: YYSTUCHHXXXXXX
+                </div>
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label for="password">
+                    Password
+                </label>
+
+                <div class="password-box">
+
+                    <input
+                        type="password"
+                        id="password"
+                        name="password"
+                        placeholder="Enter your password"
+                        required
+                    >
+
+                    <button
+                        type="button"
+                        class="show-password"
+                        onclick="togglePassword()"
+                    >
+                        Show
+                    </button>
+
+                </div>
+
+            </div>
+
+
+            <div class="login-options">
+
+                <label class="remember">
+                    <input type="checkbox">
+                    Remember me
+                </label>
+
+            </div>
+
+
+            <button
+                type="submit"
+                class="login-button"
+            >
+                Login
+            </button>
+
+        </form>
+
+
+        <div class="footer-text">
+            © 2026 SectionSync · Student Portal
+        </div>
+
+    </div>
+
+</div>
+
+
+<script>
+
+    function togglePassword() {
+
+        const password = document.getElementById("password");
+        const button = document.querySelector(".show-password");
+
+        if (password.type === "password") {
+
+            password.type = "text";
+            button.textContent = "Hide";
+
+        } else {
+
+            password.type = "password";
+            button.textContent = "Show";
+
+        }
+    }
+
+
+    function loginUser(event) {
+
+        event.preventDefault();
+
+        const enrollment =
+            document.getElementById("enrollment").value
+            .trim()
+            .toUpperCase();
+
+        const password =
+            document.getElementById("password").value;
+
+        const error =
+            document.getElementById("errorMessage");
+
+
+        /*
+         * Enrollment format:
+         *
+         * 24STUCHH010618
+         * 23STUCHH010618
+         * 25STUCHH010618
+         *
+         * First two digits = joining year
+         */
+
+        const enrollmentPattern =
+            /^(20|21|22|23|24|25|26|27|28|29)STUCHH\d{6}$/;
+
+
+        if (!enrollmentPattern.test(enrollment)) {
+
+            error.textContent =
+                "Invalid enrollment number. Example: 24STUCHH010618";
+
+            error.style.display = "block";
+
+            return;
+        }
+
+
+        if (password.length === 0) {
+
+            error.textContent =
+                "Please enter your password.";
+
+            error.style.display = "block";
+
+            return;
+        }
+
+
+        /*
+         * TEMPORARY FRONTEND LOGIN
+         *
+         * Database authentication will be
+         * connected later through Flask.
+         */
+
+        sessionStorage.setItem(
+            "studentEnrollment",
+            enrollment
+        );
+
+
+        window.location.href =
+            "/student/dashboard.html";
+    }
+
+</script>
+
+</body>
+</html>"""
