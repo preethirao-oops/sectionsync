@@ -1,3 +1,931 @@
 """Python source for the student/dashboard.html page template."""
 
-TEMPLATE_SOURCE = '<!DOCTYPE html>\n<html lang="en">\n\n<head>\n\n    <meta charset="UTF-8">\n\n    <meta name="viewport" content="width=device-width, initial-scale=1.0">\n\n    <title>Student Dashboard</title>\n\n    <style>\n\n        * {\n            margin: 0;\n            padding: 0;\n            box-sizing: border-box;\n        }\n\n        body {\n            font-family: Arial, Helvetica, sans-serif;\n            background: #f7f7fb;\n            color: #17203b;\n        }\n\n        /* ================= SIDEBAR ================= */\n\n        .sidebar {\n            position: fixed;\n            left: 0;\n            top: 0;\n            width: 240px;\n            height: 100vh;\n            background: #25233d;\n            color: white;\n            padding: 30px 14px;\n        }\n\n        .logo {\n            padding-left: 13px;\n            margin-bottom: 30px;\n        }\n\n        .logo h1 {\n            font-size: 25px;\n            font-weight: 700;\n            margin-bottom: 5px;\n        }\n\n        .logo p {\n            font-size: 13px;\n            color: #d4d0e8;\n        }\n\n        .menu {\n            list-style: none;\n        }\n\n        .menu-item {\n            margin-bottom: 8px;\n        }\n\n        .menu-link {\n            width: 100%;\n            display: flex;\n            align-items: center;\n            gap: 15px;\n            padding: 15px 18px;\n            border-radius: 9px;\n            text-decoration: none;\n            color: white;\n            font-size: 14px;\n            font-weight: 600;\n            cursor: pointer;\n            border: none;\n            background: transparent;\n            text-align: left;\n        }\n\n        .menu-link:hover {\n            background: #302d4b;\n        }\n\n        .menu-link.active {\n            background: #d8c5ff;\n            color: #19182e;\n        }\n\n        .icon {\n            width: 20px;\n            text-align: center;\n            font-size: 15px;\n        }\n\n\n        /* ================= SECTION DROPDOWN ================= */\n\n        .section-header {\n            display: flex;\n            align-items: center;\n            width: 100%;\n        }\n\n        .section-header .arrow {\n            margin-left: auto;\n            font-size: 10px;\n            transition: 0.2s;\n        }\n\n        .section-dropdown.open .arrow {\n            transform: rotate(180deg);\n        }\n\n        .submenu {\n            display: none;\n            margin-left: 33px;\n            border-left: 1px solid #57536d;\n            padding-left: 10px;\n            margin-top: 2px;\n        }\n\n        .submenu.show {\n            display: block;\n        }\n\n        .submenu a {\n            display: block;\n            color: #eeeeF5;\n            text-decoration: none;\n            padding: 10px 10px;\n            font-size: 13px;\n            border-radius: 5px;\n        }\n\n        .submenu a:hover {\n            background: #302d4b;\n        }\n\n\n        /* ================= LOGOUT ================= */\n\n        .logout {\n            position: absolute;\n            bottom: 25px;\n            left: 14px;\n            right: 14px;\n        }\n\n\n        /* ================= MAIN ================= */\n\n        .main {\n            margin-left: 240px;\n            min-height: 100vh;\n        }\n\n\n        /* ================= TOP BAR ================= */\n\n        .topbar {\n            height: 70px;\n            background: white;\n            display: flex;\n            align-items: center;\n            justify-content: flex-end;\n            padding: 0 28px;\n            border-bottom: 1px solid #e5e3eb;\n        }\n\n        .profile-area {\n            display: flex;\n            align-items: center;\n            gap: 12px;\n        }\n\n        .notification {\n            width: 20px;\n            height: 20px;\n            background: #e23851;\n            border-radius: 50%;\n            margin-right: 15px;\n        }\n\n        .avatar {\n            width: 44px;\n            height: 44px;\n            border-radius: 50%;\n            background: #eeeafc;\n            display: flex;\n            justify-content: center;\n            align-items: center;\n            font-size: 21px;\n        }\n\n        .user-details {\n            line-height: 1.3;\n        }\n\n        .user-name {\n            font-size: 14px;\n            font-weight: bold;\n        }\n\n        .user-id {\n            font-size: 12px;\n            color: #71809b;\n        }\n\n        .top-arrow {\n            margin-left: 5px;\n        }\n\n\n        /* ================= CONTENT ================= */\n\n        .content {\n            padding: 12px 35px 30px;\n        }\n\n\n        /* ================= WELCOME ================= */\n\n        .welcome-card {\n            background: white;\n            border: 1px solid #e4e0ec;\n            border-radius: 15px;\n            padding: 35px 32px;\n            display: flex;\n            justify-content: space-between;\n            align-items: center;\n            margin-bottom: 23px;\n        }\n\n        .welcome-card h1 {\n            font-size: 30px;\n            margin-bottom: 8px;\n            color: #172b51;\n        }\n\n        .welcome-card p {\n            color: #68738e;\n            font-size: 14px;\n        }\n\n        .welcome-image {\n            width: 82px;\n            height: 82px;\n            border-radius: 50%;\n            background: #eee8ff;\n            display: flex;\n            justify-content: center;\n            align-items: center;\n            font-size: 42px;\n        }\n\n\n        /* ================= SUMMARY CARDS ================= */\n\n        .cards {\n            display: grid;\n            grid-template-columns: repeat(3, 1fr);\n            gap: 15px;\n            margin-bottom: 23px;\n        }\n\n        .card {\n            background: white;\n            border: 1px solid #e2dfea;\n            border-radius: 13px;\n            padding: 20px;\n        }\n\n        .card-icon {\n            width: 40px;\n            height: 40px;\n            border-radius: 9px;\n            background: #f0eaff;\n            display: flex;\n            justify-content: center;\n            align-items: center;\n            color: #713ce6;\n            font-size: 18px;\n            margin-bottom: 15px;\n        }\n\n        .card-title {\n            font-size: 12px;\n            color: #71809b;\n            margin-bottom: 8px;\n        }\n\n        .card-value {\n            font-size: 18px;\n            font-weight: bold;\n            color: #17203b;\n        }\n\n        .pending {\n            color: #e18b00;\n        }\n\n        .verified {\n            color: #15966a;\n        }\n\n\n        /* ================= BOTTOM ================= */\n\n        .bottom-grid {\n            display: grid;\n            grid-template-columns: 1.55fr 1fr;\n            gap: 20px;\n        }\n\n        .panel {\n            background: white;\n            border: 1px solid #e2dfea;\n            border-radius: 13px;\n            overflow: hidden;\n        }\n\n        .panel-header {\n            padding: 20px 22px;\n            border-bottom: 1px solid #e8e5ee;\n            display: flex;\n            justify-content: space-between;\n            align-items: center;\n        }\n\n        .panel-header h3 {\n            font-size: 16px;\n        }\n\n        .view-btn {\n            background: white;\n            border: 1px solid #7845e8;\n            color: #7845e8;\n            padding: 8px 13px;\n            border-radius: 7px;\n            cursor: pointer;\n            font-size: 11px;\n        }\n\n        .view-btn:hover {\n            background: #7845e8;\n            color: white;\n        }\n\n        .panel-body {\n            padding: 12px 22px;\n        }\n\n        .preference {\n            display: flex;\n            justify-content: space-between;\n            align-items: center;\n            padding: 10px 0;\n            border-bottom: 1px solid #eeeef3;\n        }\n\n        .preference:last-child {\n            border-bottom: none;\n        }\n\n        .preference-left {\n            display: flex;\n            align-items: center;\n            gap: 10px;\n            font-size: 13px;\n        }\n\n        .number {\n            width: 28px;\n            height: 28px;\n            border-radius: 6px;\n            background: #eee8ff;\n            color: #7140d9;\n            display: flex;\n            align-items: center;\n            justify-content: center;\n            font-weight: bold;\n        }\n\n        .badge {\n            background: #e7f6ef;\n            color: #249261;\n            padding: 6px 10px;\n            border-radius: 15px;\n            font-size: 10px;\n        }\n\n        .notice-content {\n            padding: 23px;\n        }\n\n        .notice-title {\n            font-weight: bold;\n            font-size: 14px;\n            margin-bottom: 10px;\n        }\n\n        .notice-text {\n            font-size: 13px;\n            line-height: 1.6;\n            color: #6c7891;\n        }\n\n\n        /* ================= RESPONSIVE ================= */\n\n        @media (max-width: 900px) {\n\n            .sidebar {\n                width: 210px;\n            }\n\n            .main {\n                margin-left: 210px;\n            }\n\n            .cards {\n                grid-template-columns: 1fr;\n            }\n\n            .bottom-grid {\n                grid-template-columns: 1fr;\n            }\n        }\n\n        @media (max-width: 650px) {\n\n            .sidebar {\n                position: relative;\n                width: 100%;\n                height: auto;\n            }\n\n            .main {\n                margin-left: 0;\n            }\n\n            .logout {\n                position: static;\n                margin-top: 15px;\n            }\n\n            .content {\n                padding: 15px;\n            }\n\n            .welcome-image {\n                display: none;\n            }\n        }\n\n    </style>\n\n</head>\n\n\n<body>\n\n\n<!-- ================= SIDEBAR ================= -->\n\n<div class="sidebar">\n\n\n    <div class="logo">\n\n        <h1>\n            SectionSync\n        </h1>\n\n        <p>\n            Student Portal\n        </p>\n\n    </div>\n\n\n    <ul class="menu">\n\n\n        <!-- DASHBOARD -->\n\n        <li class="menu-item">\n\n            <a\n                href="/student/dashboard"\n                class="menu-link active"\n            >\n\n                <span class="icon">\n                    ⌂\n                </span>\n\n                <span>\n                    Dashboard\n                </span>\n\n            </a>\n\n        </li>\n\n\n        <!-- PROFILE -->\n\n        <li class="menu-item">\n\n            <a\n                href="/student/profile"\n                class="menu-link"\n            >\n\n                <span class="icon">\n                    ●\n                </span>\n\n                <span>\n                    My Profile\n                </span>\n\n            </a>\n\n        </li>\n\n\n        <!-- FEE VERIFICATION -->\n\n        <li class="menu-item">\n\n            <a\n                href="/student/fee-verification"\n                class="menu-link"\n            >\n\n                <span class="icon">\n                    ▣\n                </span>\n\n                <span>\n                    Fee Verification\n                </span>\n\n            </a>\n\n        </li>\n\n\n        <!-- SECTION PREFERENCES -->\n\n        <li\n            class="menu-item section-dropdown"\n            id="sectionDropdown"\n        >\n\n            <button\n                type="button"\n                class="menu-link"\n                onclick="toggleDropdown()"\n            >\n\n                <div class="section-header">\n\n                    <span class="icon">\n                        ▣\n                    </span>\n\n                    <span>\n                        Section Preferences\n                    </span>\n\n                    <span class="arrow">\n                        ⌃\n                    </span>\n\n                </div>\n\n            </button>\n\n\n            <div\n                class="submenu"\n                id="submenu"\n            >\n\n                <a href="/student/live-basket-filling">\n\n                    Live Basket Filling\n\n                </a>\n\n\n                <a href="/student/section-preferences">\n\n                    Preferred Sections\n\n                </a>\n\n            </div>\n\n        </li>\n\n\n        <!-- ALLOCATION STATUS -->\n\n        <li class="menu-item">\n\n            <a\n                href="/student/allocation-status"\n                class="menu-link"\n            >\n\n                <span class="icon">\n                    ◔\n                </span>\n\n                <span>\n                    Allocation Status\n                </span>\n\n            </a>\n\n        </li>\n\n\n    </ul>\n\n\n\n    <!-- LOGOUT -->\n\n    <div class="logout">\n\n        <a\n            href="/logout"\n            class="menu-link"\n        >\n\n            <span class="icon">\n                ↪\n            </span>\n\n            <span>\n                Logout\n            </span>\n\n        </a>\n\n    </div>\n\n\n</div>\n\n\n\n<!-- ================= MAIN ================= -->\n\n<div class="main">\n\n\n    <!-- ================= TOP BAR ================= -->\n\n    <div class="topbar">\n\n\n        <div class="profile-area">\n\n\n            <div class="notification"></div>\n\n\n            <div class="avatar">\n                👤\n            </div>\n\n\n            <div class="user-details">\n\n                <div class="user-name">\n                    {{ student[\'student_name\'] }}\n                </div>\n\n                <div class="user-id">\n                    {{ student[\'enrollment_no\'] }}\n                </div>\n\n            </div>\n\n\n            <span class="top-arrow">\n                ▼\n            </span>\n\n\n        </div>\n\n    </div>\n\n\n\n    <!-- ================= CONTENT ================= -->\n\n    <div class="content">\n\n\n        <!-- ================= WELCOME ================= -->\n\n        <div class="welcome-card">\n\n\n            <div>\n\n                <h1>\n                    Hello, {{ student[\'student_name\'].split()[0] }}! 👋\n                </h1>\n\n                <p>\n                    Welcome to the Multi-Section Management System.\n                </p>\n\n            </div>\n\n\n            <div class="welcome-image">\n                🎓\n            </div>\n\n\n        </div>\n\n\n\n        <!-- ================= SUMMARY CARDS ================= -->\n\n        <div class="cards">\n\n\n            <!-- ALLOCATION -->\n\n            <div class="card">\n\n                <div class="card-icon">\n                    ◷\n                </div>\n\n                <div class="card-title">\n                    Allocation Status\n                </div>\n\n                <div class="card-value {{ \'verified\' if allocation else \'pending\' }}">\n                    {{ allocation[\'section_name\'] if allocation else \'Pending\' }}\n                </div>\n\n            </div>\n\n\n\n            <!-- SEMESTER -->\n\n            <div class="card">\n\n                <div class="card-icon">\n                    ▣\n                </div>\n\n                <div class="card-title">\n                    Program\n                </div>\n\n                <div class="card-value">\n                    {{ student[\'program\'] }}\n                </div>\n\n            </div>\n\n\n\n            <!-- FEE -->\n\n            <div class="card">\n\n                <div class="card-icon">\n                    ✓\n                </div>\n\n                <div class="card-title">\n                    Fee Verification\n                </div>\n\n                <div class="card-value {{ \'verified\' if fee_status == \'Verified\' else \'pending\' }}">\n                    {{ fee_status }}\n                </div>\n\n            </div>\n\n\n        </div>\n\n\n\n        <!-- ================= LOWER CONTENT ================= -->\n\n        <div class="bottom-grid">\n\n\n            <!-- PREFERENCES -->\n\n            <div class="panel">\n\n\n                <div class="panel-header">\n\n                    <h3>\n                        Your Section Preferences\n                    </h3>\n\n\n                    <button\n                        class="view-btn"\n                        onclick="window.location.href=\'/student/section-preferences\'"\n                    >\n\n                        View / Edit\n\n                    </button>\n\n                </div>\n\n\n\n                <div class="panel-body">\n                    {% for preference in preferences %}\n                    <div class="preference">\n                        <div class="preference-left">\n                            <span class="number">{{ loop.index }}</span>\n                            <span>{{ preference[\'section_name\'] }}</span>\n                        </div>\n                        <span class="badge">Preference {{ loop.index }}</span>\n                    </div>\n                    {% else %}\n                    <p>No section preferences submitted yet.</p>\n                    {% endfor %}\n                </div>\n\n            </div>\n\n\n\n            <!-- NOTICE -->\n\n            <div class="panel">\n\n\n                <div class="panel-header">\n\n                    <h3>\n                        Important Notice\n                    </h3>\n\n                </div>\n\n\n                <div class="notice-content">\n\n\n                    <div class="notice-title">\n                        📌\n                    </div>\n\n\n                    <div class="notice-title">\n                        Section allocation\n                    </div>\n\n\n                    <p class="notice-text">\n\n                        {% if allocation %}\n                        You have been allocated to {{ allocation[\'section_name\'] }}.\n                        {% else %}\n                        Allocation is pending until the administrator runs allocation.\n                        {% endif %}\n\n                    </p>\n\n\n                </div>\n\n\n            </div>\n\n\n        </div>\n\n\n    </div>\n\n\n</div>\n\n\n\n<!-- ================= JAVASCRIPT ================= -->\n\n<script>\n\nfunction toggleDropdown() {\n\n    const submenu =\n        document.getElementById("submenu");\n\n    const dropdown =\n        document.getElementById("sectionDropdown");\n\n    submenu.classList.toggle("show");\n\n    dropdown.classList.toggle("open");\n\n}\n\n</script>\n\n\n</body>\n\n</html>\n'
+TEMPLATE_SOURCE = r"""<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Student Dashboard</title>
+
+    <style>
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            background: #f7f7fb;
+            color: #17203b;
+        }
+
+        /* ================= SIDEBAR ================= */
+
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 240px;
+            height: 100vh;
+            background: #25233d;
+            color: white;
+            padding: 30px 14px;
+        }
+
+        .logo {
+            padding-left: 13px;
+            margin-bottom: 30px;
+        }
+
+        .logo h1 {
+            font-size: 25px;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .logo p {
+            font-size: 13px;
+            color: #d4d0e8;
+        }
+
+        .menu {
+            list-style: none;
+        }
+
+        .menu-item {
+            margin-bottom: 8px;
+        }
+
+        .menu-link {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px 18px;
+            border-radius: 9px;
+            text-decoration: none;
+            color: white;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            background: transparent;
+            text-align: left;
+        }
+
+        .menu-link:hover {
+            background: #302d4b;
+        }
+
+        .menu-link.active {
+            background: #d8c5ff;
+            color: #19182e;
+        }
+
+        .icon {
+            width: 20px;
+            text-align: center;
+            font-size: 15px;
+        }
+
+
+        /* ================= SECTION DROPDOWN ================= */
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            width: 100%;
+        }
+
+        .section-header .arrow {
+            margin-left: auto;
+            font-size: 10px;
+            transition: 0.2s;
+        }
+
+        .section-dropdown.open .arrow {
+            transform: rotate(180deg);
+        }
+
+        .submenu {
+            display: none;
+            margin-left: 33px;
+            border-left: 1px solid #57536d;
+            padding-left: 10px;
+            margin-top: 2px;
+        }
+
+        .submenu.show {
+            display: block;
+        }
+
+        .submenu a {
+            display: block;
+            color: #eeeeF5;
+            text-decoration: none;
+            padding: 10px 10px;
+            font-size: 13px;
+            border-radius: 5px;
+        }
+
+        .submenu a:hover {
+            background: #302d4b;
+        }
+
+
+        /* ================= LOGOUT ================= */
+
+        .logout {
+            position: absolute;
+            bottom: 25px;
+            left: 14px;
+            right: 14px;
+        }
+
+
+        /* ================= MAIN ================= */
+
+        .main {
+            margin-left: 240px;
+            min-height: 100vh;
+        }
+
+
+        /* ================= TOP BAR ================= */
+
+        .topbar {
+            height: 70px;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding: 0 28px;
+            border-bottom: 1px solid #e5e3eb;
+        }
+
+        .profile-area {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .notification {
+            width: 20px;
+            height: 20px;
+            background: #e23851;
+            border-radius: 50%;
+            margin-right: 15px;
+        }
+
+        .avatar {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: #eeeafc;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 21px;
+        }
+
+        .user-details {
+            line-height: 1.3;
+        }
+
+        .user-name {
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        .user-id {
+            font-size: 12px;
+            color: #71809b;
+        }
+
+        .top-arrow {
+            margin-left: 5px;
+        }
+
+
+        /* ================= CONTENT ================= */
+
+        .content {
+            padding: 12px 35px 30px;
+        }
+
+
+        /* ================= WELCOME ================= */
+
+        .welcome-card {
+            background: white;
+            border: 1px solid #e4e0ec;
+            border-radius: 15px;
+            padding: 35px 32px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 23px;
+        }
+
+        .welcome-card h1 {
+            font-size: 30px;
+            margin-bottom: 8px;
+            color: #172b51;
+        }
+
+        .welcome-card p {
+            color: #68738e;
+            font-size: 14px;
+        }
+
+        .welcome-image {
+            width: 82px;
+            height: 82px;
+            border-radius: 50%;
+            background: #eee8ff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 42px;
+        }
+
+
+        /* ================= SUMMARY CARDS ================= */
+
+        .cards {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-bottom: 23px;
+        }
+
+        .card {
+            background: white;
+            border: 1px solid #e2dfea;
+            border-radius: 13px;
+            padding: 20px;
+        }
+
+        .card-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 9px;
+            background: #f0eaff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #713ce6;
+            font-size: 18px;
+            margin-bottom: 15px;
+        }
+
+        .card-title {
+            font-size: 12px;
+            color: #71809b;
+            margin-bottom: 8px;
+        }
+
+        .card-value {
+            font-size: 18px;
+            font-weight: bold;
+            color: #17203b;
+        }
+
+        .pending {
+            color: #e18b00;
+        }
+
+        .verified {
+            color: #15966a;
+        }
+
+
+        /* ================= BOTTOM ================= */
+
+        .bottom-grid {
+            display: grid;
+            grid-template-columns: 1.55fr 1fr;
+            gap: 20px;
+        }
+
+        .panel {
+            background: white;
+            border: 1px solid #e2dfea;
+            border-radius: 13px;
+            overflow: hidden;
+        }
+
+        .panel-header {
+            padding: 20px 22px;
+            border-bottom: 1px solid #e8e5ee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .panel-header h3 {
+            font-size: 16px;
+        }
+
+        .view-btn {
+            background: white;
+            border: 1px solid #7845e8;
+            color: #7845e8;
+            padding: 8px 13px;
+            border-radius: 7px;
+            cursor: pointer;
+            font-size: 11px;
+        }
+
+        .view-btn:hover {
+            background: #7845e8;
+            color: white;
+        }
+
+        .panel-body {
+            padding: 12px 22px;
+        }
+
+        .preference {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid #eeeef3;
+        }
+
+        .preference:last-child {
+            border-bottom: none;
+        }
+
+        .preference-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 13px;
+        }
+
+        .number {
+            width: 28px;
+            height: 28px;
+            border-radius: 6px;
+            background: #eee8ff;
+            color: #7140d9;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+        .badge {
+            background: #e7f6ef;
+            color: #249261;
+            padding: 6px 10px;
+            border-radius: 15px;
+            font-size: 10px;
+        }
+
+        .notice-content {
+            padding: 23px;
+        }
+
+        .notice-title {
+            font-weight: bold;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+
+        .notice-text {
+            font-size: 13px;
+            line-height: 1.6;
+            color: #6c7891;
+        }
+
+
+        /* ================= RESPONSIVE ================= */
+
+        @media (max-width: 900px) {
+
+            .sidebar {
+                width: 210px;
+            }
+
+            .main {
+                margin-left: 210px;
+            }
+
+            .cards {
+                grid-template-columns: 1fr;
+            }
+
+            .bottom-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 650px) {
+
+            .sidebar {
+                position: relative;
+                width: 100%;
+                height: auto;
+            }
+
+            .main {
+                margin-left: 0;
+            }
+
+            .logout {
+                position: static;
+                margin-top: 15px;
+            }
+
+            .content {
+                padding: 15px;
+            }
+
+            .welcome-image {
+                display: none;
+            }
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<!-- ================= SIDEBAR ================= -->
+
+<div class="sidebar">
+
+
+    <div class="logo">
+
+        <h1>
+            SectionSync
+        </h1>
+
+        <p>
+            Student Portal
+        </p>
+
+    </div>
+
+
+    <ul class="menu">
+
+
+        <!-- DASHBOARD -->
+
+        <li class="menu-item">
+
+            <a
+                href="/student/dashboard"
+                class="menu-link active"
+            >
+
+                <span class="icon">
+                    ⌂
+                </span>
+
+                <span>
+                    Dashboard
+                </span>
+
+            </a>
+
+        </li>
+
+
+        <!-- PROFILE -->
+
+        <li class="menu-item">
+
+            <a
+                href="/student/profile"
+                class="menu-link"
+            >
+
+                <span class="icon">
+                    ●
+                </span>
+
+                <span>
+                    My Profile
+                </span>
+
+            </a>
+
+        </li>
+
+
+        <!-- FEE VERIFICATION -->
+
+        <li class="menu-item">
+
+            <a
+                href="/student/fee-verification"
+                class="menu-link"
+            >
+
+                <span class="icon">
+                    ▣
+                </span>
+
+                <span>
+                    Fee Verification
+                </span>
+
+            </a>
+
+        </li>
+
+
+        <!-- SECTION PREFERENCES -->
+
+        <li
+            class="menu-item section-dropdown"
+            id="sectionDropdown"
+        >
+
+            <button
+                type="button"
+                class="menu-link"
+                onclick="toggleDropdown()"
+            >
+
+                <div class="section-header">
+
+                    <span class="icon">
+                        ▣
+                    </span>
+
+                    <span>
+                        Section Preferences
+                    </span>
+
+                    <span class="arrow">
+                        ⌃
+                    </span>
+
+                </div>
+
+            </button>
+
+
+            <div
+                class="submenu"
+                id="submenu"
+            >
+
+                <a href="/student/live-basket-filling">
+
+                    Live Basket Filling
+
+                </a>
+
+
+                <a href="/student/section-preferences">
+
+                    Preferred Sections
+
+                </a>
+
+            </div>
+
+        </li>
+
+
+        <!-- ALLOCATION STATUS -->
+
+        <li class="menu-item">
+
+            <a
+                href="/student/allocation-status"
+                class="menu-link"
+            >
+
+                <span class="icon">
+                    ◔
+                </span>
+
+                <span>
+                    Allocation Status
+                </span>
+
+            </a>
+
+        </li>
+
+
+    </ul>
+
+
+
+    <!-- LOGOUT -->
+
+    <div class="logout">
+
+        <a
+            href="/logout"
+            class="menu-link"
+        >
+
+            <span class="icon">
+                ↪
+            </span>
+
+            <span>
+                Logout
+            </span>
+
+        </a>
+
+    </div>
+
+
+</div>
+
+
+
+<!-- ================= MAIN ================= -->
+
+<div class="main">
+
+
+    <!-- ================= TOP BAR ================= -->
+
+    <div class="topbar">
+
+
+        <div class="profile-area">
+
+
+            <div class="notification"></div>
+
+
+            <div class="avatar">
+                👤
+            </div>
+
+
+            <div class="user-details">
+
+                <div class="user-name">
+                    {{ student['student_name'] }}
+                </div>
+
+                <div class="user-id">
+                    {{ student['enrollment_no'] }}
+                </div>
+
+            </div>
+
+
+            <span class="top-arrow">
+                ▼
+            </span>
+
+
+        </div>
+
+    </div>
+
+
+
+    <!-- ================= CONTENT ================= -->
+
+    <div class="content">
+
+
+        <!-- ================= WELCOME ================= -->
+
+        <div class="welcome-card">
+
+
+            <div>
+
+                <h1>
+                    Hello, {{ student['student_name'].split()[0] }}! 👋
+                </h1>
+
+                <p>
+                    Welcome to the Multi-Section Management System.
+                </p>
+
+            </div>
+
+
+            <div class="welcome-image">
+                🎓
+            </div>
+
+
+        </div>
+
+
+
+        <!-- ================= SUMMARY CARDS ================= -->
+
+        <div class="cards">
+
+
+            <!-- ALLOCATION -->
+
+            <div class="card">
+
+                <div class="card-icon">
+                    ◷
+                </div>
+
+                <div class="card-title">
+                    Allocation Status
+                </div>
+
+                <div class="card-value {{ 'verified' if allocation else 'pending' }}">
+                    {{ allocation['section_name'] if allocation else 'Pending' }}
+                </div>
+
+            </div>
+
+
+
+            <!-- SEMESTER -->
+
+            <div class="card">
+
+                <div class="card-icon">
+                    ▣
+                </div>
+
+                <div class="card-title">
+                    Program
+                </div>
+
+                <div class="card-value">
+                    {{ student['program'] }}
+                </div>
+
+            </div>
+
+
+
+            <!-- FEE -->
+
+            <div class="card">
+
+                <div class="card-icon">
+                    ✓
+                </div>
+
+                <div class="card-title">
+                    Fee Verification
+                </div>
+
+                <div class="card-value {{ 'verified' if fee_status == 'Verified' else 'pending' }}">
+                    {{ fee_status }}
+                </div>
+
+            </div>
+
+
+        </div>
+
+
+
+        <!-- ================= LOWER CONTENT ================= -->
+
+        <div class="bottom-grid">
+
+
+            <!-- PREFERENCES -->
+
+            <div class="panel">
+
+
+                <div class="panel-header">
+
+                    <h3>
+                        Your Section Preferences
+                    </h3>
+
+
+                    <button
+                        class="view-btn"
+                        onclick="window.location.href='/student/section-preferences'"
+                    >
+
+                        View / Edit
+
+                    </button>
+
+                </div>
+
+
+
+                <div class="panel-body">
+                    {% for preference in preferences %}
+                    <div class="preference">
+                        <div class="preference-left">
+                            <span class="number">{{ loop.index }}</span>
+                            <span>{{ preference['section_name'] }}</span>
+                        </div>
+                        <span class="badge">Preference {{ loop.index }}</span>
+                    </div>
+                    {% else %}
+                    <p>No section preferences submitted yet.</p>
+                    {% endfor %}
+                </div>
+
+            </div>
+
+
+
+            <!-- NOTICE -->
+
+            <div class="panel">
+
+
+                <div class="panel-header">
+
+                    <h3>
+                        Important Notice
+                    </h3>
+
+                </div>
+
+
+                <div class="notice-content">
+
+
+                    <div class="notice-title">
+                        📌
+                    </div>
+
+
+                    <div class="notice-title">
+                        Section allocation
+                    </div>
+
+
+                    <p class="notice-text">
+
+                        {% if allocation %}
+                        You have been allocated to {{ allocation['section_name'] }}.
+                        {% else %}
+                        Allocation is pending until the administrator runs allocation.
+                        {% endif %}
+
+                    </p>
+
+
+                </div>
+
+
+            </div>
+
+
+        </div>
+
+
+    </div>
+
+
+</div>
+
+
+
+<!-- ================= JAVASCRIPT ================= -->
+
+<script>
+
+function toggleDropdown() {
+
+    const submenu =
+        document.getElementById("submenu");
+
+    const dropdown =
+        document.getElementById("sectionDropdown");
+
+    submenu.classList.toggle("show");
+
+    dropdown.classList.toggle("open");
+
+}
+
+</script>
+
+
+</body>
+
+</html>
+"""
