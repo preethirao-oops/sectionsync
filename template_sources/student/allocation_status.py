@@ -1,3 +1,62 @@
 """Python source for the student/allocation_status.html page template."""
 
-TEMPLATE_SOURCE = '<!DOCTYPE html>\n<html lang="en">\n<head>\n    <meta charset="UTF-8">\n    <meta name="viewport" content="width=device-width, initial-scale=1.0">\n    <title>Allocation Status - SectionSync</title>\n    <style>\n        * { box-sizing: border-box; font-family: Arial, sans-serif; }\n        body { margin: 0; background: #f4f6fa; color: #18345d; }\n        header { display: flex; align-items: center; justify-content: space-between; padding: 20px 32px; background: #fff; border-bottom: 1px solid #dfe3ea; }\n        header h1 { margin: 0; color: #15365f; font-size: 24px; }\n        header a { color: #2874d8; text-decoration: none; font-size: 14px; font-weight: 600; }\n        main { width: min(900px, calc(100% - 40px)); margin: 35px auto; }\n        .heading { margin-bottom: 22px; }\n        .heading h2 { margin: 0 0 7px; font-size: 24px; }\n        .heading p { margin: 0; color: #64748b; }\n        .card { background: white; border: 1px solid #dfe3ea; border-radius: 12px; padding: 26px; }\n        .student { color: #64748b; font-size: 14px; margin-bottom: 20px; }\n        .result { padding: 22px; border-radius: 10px; background: #eaf2ff; }\n        .result.pending { background: #fff4db; }\n        .label { color: #64748b; font-size: 13px; margin-bottom: 8px; }\n        .section { color: #17375e; font-size: 25px; font-weight: 700; }\n        .details { display: flex; flex-wrap: wrap; gap: 25px; margin-top: 20px; color: #52647d; font-size: 14px; }\n        .details strong { color: #17375e; }\n        @media (max-width: 600px) { header { padding: 18px; } main { margin: 22px auto; } .card { padding: 18px; } }\n    </style>\n</head>\n<body>\n    <header>\n        <h1>SectionSync</h1>\n        <a href="{{ url_for(\'student_dashboard\') }}">Back to Dashboard</a>\n    </header>\n    <main>\n        <div class="heading">\n            <h2>Allocation Status</h2>\n            <p>Your final section assignment will appear here after the allocation is run.</p>\n        </div>\n        <section class="card">\n            <div class="student">{{ student[\'student_name\'] }} · {{ student[\'enrollment_no\'] }} · {{ student[\'program\'] }}</div>\n            {% if student[\'section_name\'] %}\n            <div class="result">\n                <div class="label">You have been allocated to</div>\n                <div class="section">{{ student[\'section_name\'] }}</div>\n                <div class="details">\n                    <span>CGPA band: <strong>{{ student[\'cgpa_band\']|capitalize }}</strong></span>\n                    {% if student[\'allocated_at\'] %}<span>Allocated: <strong>{{ student[\'allocated_at\'] }}</strong></span>{% endif %}\n                </div>\n            </div>\n            {% else %}\n            <div class="result pending">\n                <div class="label">Current status</div>\n                <div class="section">Pending</div>\n                <div class="details"><span>Your administrator has not assigned a section to your account yet.</span></div>\n            </div>\n            {% endif %}\n        </section>\n    </main>\n</body>\n</html>\n'
+TEMPLATE_SOURCE = r"""<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Allocation Status - SectionSync</title>
+    <style>
+        * { box-sizing: border-box; font-family: Arial, sans-serif; }
+        body { margin: 0; background: #f4f6fa; color: #18345d; }
+        header { display: flex; align-items: center; justify-content: space-between; padding: 20px 32px; background: #fff; border-bottom: 1px solid #dfe3ea; }
+        header h1 { margin: 0; color: #15365f; font-size: 24px; }
+        header a { color: #2874d8; text-decoration: none; font-size: 14px; font-weight: 600; }
+        main { width: min(900px, calc(100% - 40px)); margin: 35px auto; }
+        .heading { margin-bottom: 22px; }
+        .heading h2 { margin: 0 0 7px; font-size: 24px; }
+        .heading p { margin: 0; color: #64748b; }
+        .card { background: white; border: 1px solid #dfe3ea; border-radius: 12px; padding: 26px; }
+        .student { color: #64748b; font-size: 14px; margin-bottom: 20px; }
+        .result { padding: 22px; border-radius: 10px; background: #eaf2ff; }
+        .result.pending { background: #fff4db; }
+        .label { color: #64748b; font-size: 13px; margin-bottom: 8px; }
+        .section { color: #17375e; font-size: 25px; font-weight: 700; }
+        .details { display: flex; flex-wrap: wrap; gap: 25px; margin-top: 20px; color: #52647d; font-size: 14px; }
+        .details strong { color: #17375e; }
+        @media (max-width: 600px) { header { padding: 18px; } main { margin: 22px auto; } .card { padding: 18px; } }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>SectionSync</h1>
+        <a href="{{ url_for('student_dashboard') }}">Back to Dashboard</a>
+    </header>
+    <main>
+        <div class="heading">
+            <h2>Allocation Status</h2>
+            <p>Your final section assignment will appear here after the allocation is run.</p>
+        </div>
+        <section class="card">
+            <div class="student">{{ student['student_name'] }} · {{ student['enrollment_no'] }} · {{ student['program'] }}</div>
+            {% if student['section_name'] %}
+            <div class="result">
+                <div class="label">You have been allocated to</div>
+                <div class="section">{{ student['section_name'] }}</div>
+                <div class="details">
+                    <span>CGPA band: <strong>{{ student['cgpa_band']|capitalize }}</strong></span>
+                    {% if student['allocated_at'] %}<span>Allocated: <strong>{{ student['allocated_at'] }}</strong></span>{% endif %}
+                </div>
+            </div>
+            {% else %}
+            <div class="result pending">
+                <div class="label">Current status</div>
+                <div class="section">Pending</div>
+                <div class="details"><span>Your administrator has not assigned a section to your account yet.</span></div>
+            </div>
+            {% endif %}
+        </section>
+    </main>
+</body>
+</html>
+"""
